@@ -37,7 +37,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - [ ] Create a simple key-value database to store objects. Why? Because we are using C++14 and we do not have access to std::filesystem which simplifies the task considerably. Library.
 
   Key: oid.
-  Value: ??.
+  Value: object of oid + size.
 
 # Milestones.
 
