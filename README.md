@@ -35,13 +35,14 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 
 - [X] Create HTTP server that supports POST requests. Library.
 - [X] Handle HTTP POST request and call a given function, i.e. batch_handler().
-- [ ] Unpack the contents of the HTTP POST request in batch_handler().
+- [X] Unpack the contents of the HTTP POST request in batch_handler().
+- [] Define my own request, status code, etc as an interface to the library.
+- [] Define my own JSON class as an interface to the library.
 - [ ] Create the entity batch_response, this will store the actual response to the API call (/batch/objects).
-- [ ] Create a simple key-value database to store objects. Why? Because we are using C++14 and we do not have access to std::filesystem which simplifies the task considerably. Library.
-
-  Key: oid.
-  Value: object of oid + size.
 
 # Milestones.
 
 - [X] Create an HTTP server and handle the batch API request on /objects/batch. Respond always with a 200 code status but with a JSON saying that the object was not found.
+- [X] Decode the request onto a JSON.
+- [] Decode that JSON into an object.
+- [] Process a "download" operation.

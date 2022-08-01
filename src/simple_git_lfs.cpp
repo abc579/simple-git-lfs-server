@@ -3,10 +3,12 @@
 void
 sgl::batch_handler(const httplib::Request &request, httplib::Response &response)
 {
-    auto json_request = json11::Json(request.body);
-
-    std::cout << json_request.dump() << std::endl;
-    std::cout << "operation:" << json_request["operation"].string_value() << std::endl;
+    try {
+        auto json_request = json(request.body);
+        std::cout << json_request.get_string_value("operation") << std::endl;
+    } catch (const json_parse_error &jpe) {
+        std::cerr << jpe.what() << std::endl;
+    }
 
     response.set_content("Let's all love Lain\r\n", "text/plain");
 }
