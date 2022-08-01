@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -g3 -Wall -Werror -Wpedantic -Wextra -fsanitize=address
+CXXFLAGS = -g3 -Wall -Werror -Wpedantic -Wextra -fsanitize=address -Wno-unused-parameter
 LDFLAGS =
 
 all: outdir

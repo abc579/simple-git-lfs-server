@@ -5,6 +5,8 @@
 
 namespace sgl {
 
+const std::string content_type_lfs { "application/vnd.git-lfs+json" };
+
 struct batch_response;
 
 class json_parse_error : public std::exception {
@@ -39,20 +41,28 @@ public:
 
     ~json() = default;
 public:
-    json11::Json parse(const std::string &body, std::string &err) {
+    json11::Json parse(const std::string &body, std::string &err) const {
         return json11::Json::parse(body, err);
     }
 
-    auto get_string_value(const std::string &key) {
+    auto get_string_value(const std::string &key) const {
         return value[key].string_value();
     }
 
-    auto get_int_value(const std::string &key) {
+    auto get_int_value(const std::string &key) const {
         return value[key].int_value();
     }
 
-    auto get_boolean_value(const std::string &key) {
+    auto get_boolean_value(const std::string &key) const {
         return value[key].bool_value();
+    }
+
+    auto get_array_items(const std::string &key) const {
+        return value[key].array_items();
+    }
+public:
+    auto get_value() const {
+        return value;
     }
 private:
     json11::Json value;
@@ -70,5 +80,5 @@ struct batch_post_request {
 };
 
 void batch_handler(const httplib::Request&, httplib::Response&);
-batch_response create_batch_response(const batch_post_request&);
+void create_batch_response(const json&, httplib::Response&);
 }

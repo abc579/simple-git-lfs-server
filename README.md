@@ -37,7 +37,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - [X] Handle HTTP POST request and call a given function, i.e. batch_handler().
 - [X] Unpack the contents of the HTTP POST request in batch_handler().
 - [] Define my own request, status code, etc as an interface to the library.
-- [] Define my own JSON class as an interface to the library.
+- [X] Define my own JSON class as an interface to the library.
 - [ ] Create the entity batch_response, this will store the actual response to the API call (/batch/objects).
 
 # Milestones.
