@@ -10,3 +10,6 @@ outdir:
 
 run:
 	./out/main
+
+clean:
+	rm -rf out/
