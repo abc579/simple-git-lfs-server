@@ -45,7 +45,8 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - [X] Decode the request onto a JSON.
 - [X] Decode that JSON into an object.
 - [X] Process a "download" operation and return always not found for now.
-- [] Process multiple objects in the response.
-- [] Implement download operation.
+- [X] Process multiple objects in the response.
+- [X] Implement download operation.
+- [] Impement range http request for download operations.the same thing.
 - [] Implement upload operation.
 - [] Refactor every part of the code that is using directly features of libraries.

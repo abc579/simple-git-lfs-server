@@ -7,6 +7,7 @@ main()
     httplib::Server s;
 
     s.Post("/objects/batch", sgl::batch_handler);
+    s.Get(R"(/objects/[a-zA-Z0-9]*$)", sgl::download_handler);
 
     s.listen("0.0.0.0", 8080);
 

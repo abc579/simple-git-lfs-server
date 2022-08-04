@@ -4,12 +4,18 @@
 #include "json11.hpp"
 
 #include <unordered_map>
+#include <fstream>
+#include <sys/stat.h>
+#include <iostream>
+#include <iterator>
+#include <algorithm>
 
 namespace sgl {
 
 const std::string content_type_lfs { "application/vnd.git-lfs+json" };
 const std::string hash_algo { "sha256" };
-
+const std::string file_directory { "/home/lev/repos/simple-git-lfs-server/files/" }; // @FIXME: use an environment variable or cfg file.
+const std::string accept_lfs { "application/vnd.git-lfs" };
 /**
  * @class link_object
  * @brief When the response does not involve an error, we have to create a link for the object to download. It is composed of these members.
@@ -146,4 +152,6 @@ private:
 void batch_handler(const httplib::Request&, httplib::Response&);
 void create_batch_response(const json&, httplib::Response&);
 std::string encode_batch_response(const batch_response&);
+bool can_open(const std::string &);
+void download_handler(const httplib::Request&, httplib::Response&);
 }
