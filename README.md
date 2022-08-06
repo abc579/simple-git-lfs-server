@@ -50,3 +50,4 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - [] Impement range http request for download operations.the same thing.
 - [] Implement upload operation.
 - [] Refactor every part of the code that is using directly features of libraries.
+- [] Don't use header files for libraries, compile them into an .so or .a and use its functions.
