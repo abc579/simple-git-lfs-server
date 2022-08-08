@@ -1,5 +1,5 @@
-CXX = clang++
-CXXFLAGS = -g3 -Wall -Werror -Wpedantic -Wextra -fsanitize=address -Wno-unused-parameter
+CXX = g++
+CXXFLAGS = -g3 -Wall -Wpedantic -Wextra -fsanitize=address
 LDFLAGS =
 
 all: outdir files
@@ -15,4 +15,4 @@ run:
 	./out/main
 
 clean:
-	rm -rf out/
+	rm -rf out

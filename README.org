@@ -1,0 +1,32 @@
+* simple-git-lfs-server
+
+This is a very simple and example server that implements part of the Git LFS API.
+
+Since this is a test and I am very unexperienced, it supports the basic things to download and upload lfs objects with SSH authentication.
+
+* TODO
+
+- [X] Create HTTP server that supports POST requests. Library.
+- [X] Handle HTTP POST request and call a given function, i.e. batch_handler().
+- [X] Unpack the contents of the HTTP POST request in batch_handler().
+- [X] Define my own JSON class as an interface to the library.
+- [X] Create the entity batch_response, this will store the actual response to the API call (/batch/objects).
+
+* Milestones.
+
+- [X] Create an HTTP server and handle the batch API request on /objects/batch. Respond always with a 200 code status but with a JSON saying that the object was not found.
+- [X] Decode the request onto a JSON.
+- [X] Decode that JSON into an object.
+- [X] Process a "download" operation and return always not found for now.
+- [X] Process multiple objects in the response.
+- [X] Implement download operation.
+- [] Impement range http request for download operations.
+- [] The reason why it might not work is because we uploaded the file with Go.
+- [] Implement upload operation.
+- [] Refactor every part of the code that is using directly features of libraries.
+- [] Don't use header files for libraries, compile them into an .so or .a and use its functions.
+- [] There are some things hard to refactor, for instance, some JSON stuff like creating an object which is actually a typedef; the http server, et cetera. I am going to leave this for the end.
+
+* Chores.
+
+- [] Investigate how opening a file works and understand it. For instance, why are we using a vector of unsigned chars? What is up with iterators?
