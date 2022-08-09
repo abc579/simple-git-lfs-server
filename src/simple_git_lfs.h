@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <sys/stat.h>
 #include <cstdint>
- 
+
 namespace sgls {
 
     const std::string content_type_lfs {"application/vnd.git-lfs+json"};
@@ -19,9 +19,11 @@ namespace sgls {
     const std::string file_directory {"/home/lev/repos/simple-git-lfs-server/files"};
     const std::string accept_lfs {"application/vnd.git-lfs"};
     const std::string download_object_link {"http://localhost:8080/objects/"};
+    const std::string upload_object_link {"http://localhost:8080/objects/"};
 
     enum class http_response_codes {
-	ok = 200
+	ok = 200,
+	auth_required_but_not_given = 401
     };
     
     enum class object_error_codes {
@@ -43,6 +45,11 @@ namespace sgls {
 	int size;
     };
 
+    struct user_data {
+	std::string user;
+	std::string passwd;
+    };
+    
     using Actions = std::unordered_map<std::string, link_object>;
     
     struct batch_response_object {
@@ -68,11 +75,14 @@ namespace sgls {
     void batch_request_handler(const request_t&, response_t&);
     void download_handler(const request_t&, response_t&);
     void create_batch_response(const json&, response_t&);
+    void upload_handler(const request_t&, response_t&);
 
     // Utility functions.
-    std::string encode_batch_response(const batch_response&);
+    std::string encode_batch_response(const batch_response&, const std::string&);
     bool can_open(const std::string&);
     size_t get_file_size(const std::string&);
     int create_directory(const std::string&);
     std::string get_filesystem_path(const std::string&); // TODO: Improve name.
+    std::string get_oid_from_url(const std::string&);
+    void save_file_in_directory(const std::string&, const std::string&);
 }
