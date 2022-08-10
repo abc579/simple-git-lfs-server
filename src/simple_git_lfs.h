@@ -49,6 +49,12 @@ namespace sgls {
 	std::string user;
 	std::string passwd;
     };
+
+    struct oid_directory {
+	std::string parent_dir;
+	std::string child_dir;
+	std::string oid;
+    };
     
     using Actions = std::unordered_map<std::string, link_object>;
     
@@ -72,6 +78,7 @@ namespace sgls {
     using request_t = httplib::Request;
     using response_t = httplib::Response;
 
+    // Handlers.
     void batch_request_handler(const request_t&, response_t&);
     void download_handler(const request_t&, response_t&);
     void create_batch_response(const json&, response_t&);
@@ -85,4 +92,6 @@ namespace sgls {
     std::string get_filesystem_path(const std::string&); // TODO: Improve name.
     std::string get_oid_from_url(const std::string&);
     void save_file_in_directory(const std::string&, const std::string&);
+    oid_directory split_oid(const std::string&);
+    bool directory_exists(const std::string&);
 }

@@ -21,8 +21,8 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] Process multiple objects in the response.
 + [X] Implement download operation.
 + [X] The reason why it might not work is because we uploaded the file with Go.
++ [X] Implement upload operation.
 + [] Setup authentication.
-+ [] Implement upload operation.
 + [] Impement range http request for download operations.
 + [] Don't use header files for libraries, compile them into an .so or .a and use its functions.
 + [] There are some things hard to refactor, for instance, some JSON stuff like creating an object which is actually a typedef; the http server, et cetera. I am going to leave this for the end.
@@ -36,6 +36,10 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 
 - [] Investigate how opening a file works and understand it. For instance, why are we using a vector of unsigned chars? What is up with iterators?
 - [] What happens when we remove objects? Do they have to be deleted from the server too?
+- [] If we upload objects that already exists, we do not have to do anything? Not even replacing them?... Weird.
+- [] How do people manage dependencies in C++? I do have two for now and the way I proceeded does not look promising. I saw some like conan.io, vcpkg, etc.
+- [] How do people structure source code and header files? Project scaffolding.
+- [] 
   
 * Not supported.
 
@@ -44,6 +48,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - Hash algo that is not sha256.
 - Authenticated property.
 - Expires at property.
+- LFS-Authenticate header in 401 responses.
 
 * Headers in UPLOAD operation.
 

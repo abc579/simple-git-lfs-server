@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <ios>
@@ -159,7 +160,7 @@ size_t sgls::get_file_size(const std::string& path)
     return file_size;
 }
 
-int create_directory(const std::string& path)
+int sgls::create_directory(const std::string& path)
 {
     return mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
@@ -167,7 +168,8 @@ int create_directory(const std::string& path)
 // Git format.
 std::string sgls::get_filesystem_path(const std::string& oid)
 {
-    return file_directory + '/' + oid.substr(0, 2) + '/' + oid.substr(2, 2) + '/' + oid.substr(4);
+    const auto oid_data = split_oid(oid);
+    return file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir + '/' + oid_data.oid;
 }
 
 // We will get something like this: "Authorization" = "Basic dGVtcDp0ZW1w".
@@ -193,22 +195,60 @@ void sgls::upload_handler(const request_t& request, response_t& response)
     // @TODO: We should have support for more than one user in the future.
     if (data.user == sv_user && data.passwd == sv_passwd) {
 	save_file_in_directory(get_oid_from_url(request.target), request.body);
+    } else {
+	response.set_header("Content-Type", content_type_lfs);
+	response.status = (int) http_response_codes::auth_required_but_not_given;
+	response.set_content(R"({ "message": "Credentials needed", "documentation_url": "https://lfs-server.com/docs/errors"})", "application/json");
     }
-    
 }
 
-std::string get_oid_from_url(const std::string& url)
+std::string sgls::get_oid_from_url(const std::string& url)
 {
     const auto pos = url.find_last_of('/');
 
     return url.substr(pos + 1);
 }
 
-void save_file_in_directory(const std::string& oid, const std::string& raw)
+sgls::oid_directory sgls::split_oid(const std::string& oid)
 {
-    // TODO: Get directory in chunks and check for dir existance.
-    // Then, create directories and finally the file.
-    if (create_directory(file_directory + ) == -1) {
-	
+    return {
+	oid.substr(0, 2),
+	oid.substr(2, 2),
+	oid.substr(4)
+    };
+}
+
+void sgls::save_file_in_directory(const std::string& oid, const std::string& raw)
+{
+    const auto oid_data = split_oid(oid);
+
+    if (!directory_exists(file_directory + '/' + oid_data.parent_dir)) {
+	if (create_directory(file_directory + '/' + oid_data.parent_dir) == -1) { // @FIXME: Error handling.
+	    std::cerr << "Could not create directory " << oid_data.parent_dir << std::endl;
+	}
     }
+
+    if (!directory_exists(file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir)) {
+	if (create_directory(file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir) == -1) { // @FIXME: Error handling.
+	    std::cerr << "Could not create directory " << oid_data.child_dir << std::endl;
+	}
+    }
+
+    // This could be optimized so we do not call two times to split_oid.
+    std::ofstream file {get_filesystem_path(oid), std::ios::out | std::ios::binary};
+    std::vector<unsigned char> raw_vec {raw.begin(), raw.end()};
+    file.write(reinterpret_cast<char *>(&raw_vec.front()), sizeof(unsigned char) * raw_vec.size());
+}
+
+bool sgls::directory_exists(const std::string& path)
+{
+    struct stat s;
+
+    stat(path.c_str(), &s);
+
+    if (S_ISDIR(s.st_mode)) {
+	return true;
+    }
+
+    return false;
 }
