@@ -22,6 +22,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] Implement download operation.
 + [X] The reason why it might not work is because we uploaded the file with Go.
 + [X] Implement upload operation.
++ [] Reduce compilation time. Improve GNUMake file.
 + [] Setup authentication.
 + [] Impement range http request for download operations.
 + [] Don't use header files for libraries, compile them into an .so or .a and use its functions.

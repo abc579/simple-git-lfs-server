@@ -1,22 +1,32 @@
 #include <cstdlib>
+#include <iostream>
 
-#include "config.h"
+#include "server_config.h"
 #include "httplib.h"
-#include "simple_git_lfs.h"
-#include "server.h"
+// #include "simple_git_lfs.h"
 
-int
-main()
+int main()
 {
-    std::ios::sync_with_stdio(false);
+    try {
+	server_config::data cfg;
+	server_config::init(cfg);
+	
+	// Avoid significant C I/O overhead: we are not going to use C I/O and
+	// we still care about performance.
+	std::ios::sync_with_stdio(false);
+	
+	httplib::Server server;
+	
+    } catch (const std::exception& e) {
+	std::cerr << e.what() << std::endl;
+	return EXIT_FAILURE;
+    }
 
-    httplib::Server server;
+    // server.Post("/objects/batch", sgls::batch_request_handler);
+    // server.Get(R"(/objects/[a-zA-Z0-9]*$)", sgls::download_handler);
+    // server.Put(R"(/objects/[a-zA-Z0-9]*$)", sgls::upload_handler);
     
-    server.Post("/objects/batch", sgls::batch_request_handler);
-    server.Get(R"(/objects/[a-zA-Z0-9]*$)", sgls::download_handler);
-    server.Put(R"(/objects/[a-zA-Z0-9]*$)", sgls::upload_handler);
-    
-    server.listen(sgls::sv_host, sgls::sv_port);
+    // server.listen(config::host, config::port);
 
     return EXIT_SUCCESS;
 }

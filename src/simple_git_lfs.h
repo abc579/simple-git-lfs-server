@@ -2,7 +2,7 @@
 
 #include "httplib.h"
 #include "json.h"
-#include "server.h"
+#include "server_config.h"
 
 #include <unordered_map>
 #include <fstream>

@@ -11,8 +11,7 @@
 
 #include "json11.hpp"
 #include "simple_git_lfs.h"
-#include "config.h"
-#include "server.h"
+#include "server_config.h"
 #include "base64.h"
 
 void sgls::batch_request_handler(const request_t& request, response_t& response)
@@ -193,7 +192,7 @@ void sgls::upload_handler(const request_t& request, response_t& response)
 
     // All good, continue and save file.
     // @TODO: We should have support for more than one user in the future.
-    if (data.user == sv_user && data.passwd == sv_passwd) {
+    if (data.user == server_config::user && data.passwd == server_config::passwd) {
 	save_file_in_directory(get_oid_from_url(request.target), request.body);
     } else {
 	response.set_header("Content-Type", content_type_lfs);

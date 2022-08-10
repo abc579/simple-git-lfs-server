@@ -1,21 +1,16 @@
+# TODO(lev): I definitely need to learn about GNUmake.
 CXX = g++
-CXXFLAGS = -O2 -Wall -Wpedantic -Wextra -fsanitize=address
-CXXFLAGS_D = -g3 -Wall -Wpedantic -Wextra -fsanitize=address -DNDEBUG
-LDFLAGS =
-SRC = src/
-OUT = out/
+CXXFLAGS = -std=c++14 -g3 -Wall -Wpedantic -Wextra -fsanitize=address -Iinc
 
-all: outdir files
-	$(CXX) $(CXXFLAGS_D) $(SRC)main.cpp $(SRC)simple_git_lfs.cpp $(SRC)json11.cpp $(SRC)base64.cpp -o $(OUT)main $(LDFLAGS)
+all :
+	$(CXX) $(CXXFLAGS) src/main.cpp src/server_config.cpp inc/httplib.cpp -o out/lfs_server
 
-outdir:
-	mkdir -p out
+run :
+	./out/lfs_server
 
-files:
-	mkdir -p files
+# If there is a target called clean/all/run then GNUmake could be confused, so we
+# will avoid that, just in case.
+.PHONY : all clean run
 
-run:
-	./out/main
-
-clean:
+clean :
 	rm -rf out
