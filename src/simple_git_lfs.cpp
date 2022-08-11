@@ -14,26 +14,26 @@
 #include "server_config.h"
 #include "base64.h"
 
-void sgls::batch_request_handler(const request_t& request, response_t& response)
+void lfs::batch_request_handler(const request_t& request, response_t& response, const server_config::data& cfg)
 {
     try {
         auto req = json(request.body);
-        create_batch_response(req, response);
+        create_batch_response(req, response, cfg);
     } catch (const json_parse_error& jpe) {
-        throw jpe;
+        throw jpe;		// @FIXME(lev): we cannot throw here, instead, send an http response.
     }
 }
 
 // In this case, the OID comes in the URL, so we have to extract that and
 // check if the file exists in the directory. If it does, store the contents
 // in a string, put that into the response and return it.
-void sgls::download_handler(const request_t& request, response_t& response)
+void lfs::download_handler(const request_t& request, response_t& response, const server_config::data& cfg)
 {
     // @FIXME: when the file is too large, git lfs client does it in chunks using range,
     // so we have to do adapt to that situation.
     const std::string oid = get_oid_from_url(request.path);
 
-    std::ifstream file (get_filesystem_path(oid), std::ios::in | std::ios::binary);
+    std::ifstream file (get_filesystem_path(oid, cfg.file_directory), std::ios::in | std::ios::binary);
     std::noskipws(file);
     std::vector<unsigned char> binary_file (std::istream_iterator<char>(file), std::istream_iterator<char>{});
     file.close();
@@ -46,7 +46,7 @@ void sgls::download_handler(const request_t& request, response_t& response)
 // We got a client request, which contains all the objects that the clients
 // wants to get. Here we check for each object if it exists and act accordingly,
 // that is, creating a response by filling the RESPONSE parameter.
-void sgls::create_batch_response(const json& request, response_t& response)
+void lfs::create_batch_response(const json& request, response_t& response, const server_config::data& cfg)
 {
     static const error_object error {"Object does not exist.", (int) object_error_codes::not_found};
     
@@ -63,11 +63,9 @@ void sgls::create_batch_response(const json& request, response_t& response)
 	    const auto oid = object["oid"].string_value();
 	    batch_object bo {oid, object["size"].int_value()};
 	
-	    if (can_open(get_filesystem_path(oid))) {
-		Actions ac = {
-		    {"actions", link_object {download_object_link + oid}}
-		};
-		br.objects.push_back({bo, ac, {}});
+	    if (can_open(get_filesystem_path(oid, cfg.file_directory))) {
+		operation_object actions = {cfg.host + cfg.download_object_path + oid};
+		br.objects.push_back({bo, actions, {}});
 	    } else {
 		br.objects.push_back({bo, {}, error});
 	    }
@@ -80,11 +78,9 @@ void sgls::create_batch_response(const json& request, response_t& response)
 	    const auto oid = object["oid"].string_value();
 	    batch_object bo {oid, object["size"].int_value()};
 
-	    Actions ac = {
-		{"actions", link_object {upload_object_link + oid}}
-	    };
+	    operation_object actions = {cfg.host + cfg.upload_object_path + oid};
 
-	    br.objects.push_back({bo, ac, {}});
+	    br.objects.push_back({bo, actions, {}});
 	}
     }
     
@@ -92,7 +88,7 @@ void sgls::create_batch_response(const json& request, response_t& response)
     response.status = (int) http_response_codes::ok;
 }
 
-std::string sgls::encode_batch_response(const batch_response& br, const std::string& operation)
+std::string lfs::encode_batch_response(const batch_response& br, const std::string& operation)
 {
     auto j = json11::Json::object {
         { "transfer", br.transfer },
@@ -103,7 +99,6 @@ std::string sgls::encode_batch_response(const batch_response& br, const std::str
 
     for (const auto& o : br.objects) {
         json11::Json::object jtemp;
-        const std::string download_link { download_object_link + o.object.oid };
 
         if (o.error.message.empty()) {
             jtemp = {
@@ -111,7 +106,7 @@ std::string sgls::encode_batch_response(const batch_response& br, const std::str
                 { "size", o.object.size},
                 {   "actions", json11::Json::object {
                         {   operation, json11::Json::object {
-                                { "href", download_link}
+                                { "href", o.actions.href }
                             }
                         }
                     }
@@ -137,14 +132,14 @@ std::string sgls::encode_batch_response(const batch_response& br, const std::str
     return json11::Json(j).dump();
 }
 
-bool sgls::can_open(const std::string& path)
+bool lfs::can_open(const std::string& path)
 {
     std::ifstream ifs (path, std::ios::in | std::ios::binary);
 
     return ifs.is_open();
 }
 
-size_t sgls::get_file_size(const std::string& path)
+size_t lfs::get_file_size(const std::string& path)
 {
     if (!can_open(path)) {
 	std::cerr << "get_file_size(): Could not open file " << path << std::endl;
@@ -159,13 +154,13 @@ size_t sgls::get_file_size(const std::string& path)
     return file_size;
 }
 
-int sgls::create_directory(const std::string& path)
+int lfs::create_directory(const std::string& path)
 {
     return mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
 
 // Git format.
-std::string sgls::get_filesystem_path(const std::string& oid)
+std::string lfs::get_filesystem_path(const std::string& oid, const std::string& file_directory)
 {
     const auto oid_data = split_oid(oid);
     return file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir + '/' + oid_data.oid;
@@ -173,7 +168,7 @@ std::string sgls::get_filesystem_path(const std::string& oid)
 
 // We will get something like this: "Authorization" = "Basic dGVtcDp0ZW1w".
 // Notice that the string has Base64 encoding.
-void sgls::upload_handler(const request_t& request, response_t& response)
+void lfs::upload_handler(const request_t& request, response_t& response, const server_config::data& cfg)
 {
     const std::string prefix {"Basic "};
     const auto encoded_auth = request.headers.find("Authorization"); // It is encoded in Base64.
@@ -192,8 +187,8 @@ void sgls::upload_handler(const request_t& request, response_t& response)
 
     // All good, continue and save file.
     // @TODO: We should have support for more than one user in the future.
-    if (data.user == server_config::user && data.passwd == server_config::passwd) {
-	save_file_in_directory(get_oid_from_url(request.target), request.body);
+    if (data.user == cfg.user && data.passwd == cfg.passwd) {
+	save_file_in_directory(get_oid_from_url(request.target), request.body, cfg);
     } else {
 	response.set_header("Content-Type", content_type_lfs);
 	response.status = (int) http_response_codes::auth_required_but_not_given;
@@ -201,14 +196,14 @@ void sgls::upload_handler(const request_t& request, response_t& response)
     }
 }
 
-std::string sgls::get_oid_from_url(const std::string& url)
+std::string lfs::get_oid_from_url(const std::string& url)
 {
     const auto pos = url.find_last_of('/');
 
     return url.substr(pos + 1);
 }
 
-sgls::oid_directory sgls::split_oid(const std::string& oid)
+lfs::oid_directory lfs::split_oid(const std::string& oid)
 {
     return {
 	oid.substr(0, 2),
@@ -217,29 +212,29 @@ sgls::oid_directory sgls::split_oid(const std::string& oid)
     };
 }
 
-void sgls::save_file_in_directory(const std::string& oid, const std::string& raw)
+void lfs::save_file_in_directory(const std::string& oid, const std::string& raw, const server_config::data& cfg)
 {
     const auto oid_data = split_oid(oid);
 
-    if (!directory_exists(file_directory + '/' + oid_data.parent_dir)) {
-	if (create_directory(file_directory + '/' + oid_data.parent_dir) == -1) { // @FIXME: Error handling.
+    if (!directory_exists(cfg.file_directory + '/' + oid_data.parent_dir)) {
+	if (create_directory(cfg.file_directory + '/' + oid_data.parent_dir) == -1) { // @FIXME: Error handling.
 	    std::cerr << "Could not create directory " << oid_data.parent_dir << std::endl;
 	}
     }
 
-    if (!directory_exists(file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir)) {
-	if (create_directory(file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir) == -1) { // @FIXME: Error handling.
+    if (!directory_exists(cfg.file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir)) {
+	if (create_directory(cfg.file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir) == -1) { // @FIXME: Error handling.
 	    std::cerr << "Could not create directory " << oid_data.child_dir << std::endl;
 	}
     }
 
     // This could be optimized so we do not call two times to split_oid.
-    std::ofstream file {get_filesystem_path(oid), std::ios::out | std::ios::binary};
+    std::ofstream file {get_filesystem_path(oid, cfg.file_directory), std::ios::out | std::ios::binary};
     std::vector<unsigned char> raw_vec {raw.begin(), raw.end()};
     file.write(reinterpret_cast<char *>(&raw_vec.front()), sizeof(unsigned char) * raw_vec.size());
 }
 
-bool sgls::directory_exists(const std::string& path)
+bool lfs::directory_exists(const std::string& path)
 {
     struct stat s;
 

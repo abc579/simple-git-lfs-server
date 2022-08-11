@@ -22,7 +22,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] Implement download operation.
 + [X] The reason why it might not work is because we uploaded the file with Go.
 + [X] Implement upload operation.
-+ [] Reduce compilation time. Improve GNUMake file.
++ [X] Reduce compilation time. Improve GNUMake file.
 + [] Setup authentication.
 + [] Impement range http request for download operations.
 + [] Don't use header files for libraries, compile them into an .so or .a and use its functions.
@@ -31,7 +31,6 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [] Support verification request.
 + [] Support all error codes.
   422 - Validation error - Json parse errors?
-+ [] Authentication.
 
 * Think about what you are doing!
 
@@ -40,7 +39,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - [] If we upload objects that already exists, we do not have to do anything? Not even replacing them?... Weird.
 - [] How do people manage dependencies in C++? I do have two for now and the way I proceeded does not look promising. I saw some like conan.io, vcpkg, etc.
 - [] How do people structure source code and header files? Project scaffolding.
-- [] 
+- [] How can we speed compilation times?
   
 * Not supported.
 

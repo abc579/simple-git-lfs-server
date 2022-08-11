@@ -1,2 +1,5 @@
 out/
 compile_commands.json
+test/test
+.cache/
+files/

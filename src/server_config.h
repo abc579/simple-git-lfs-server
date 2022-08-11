@@ -15,11 +15,13 @@ namespace server_config {
     };
 
     struct data {
-	const char* host {""};
-	const char* user {""};
-	const char* passwd {""};
+	std::string host {""};	// @TODO(lev): Get rid of the last /.
+	std::string user {""};
+	std::string passwd {""};
 	int port {0};
-	const char* file_directory {""};
+	std::string file_directory {""};
+	std::string upload_object_path {"/objects/"};
+	std::string download_object_path {"/objects/"};
     };
 
     void init(data&);

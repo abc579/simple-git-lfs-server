@@ -7,7 +7,7 @@
 
 #include "json11.hpp"
 
-namespace sgls {
+namespace lfs {
 
     class json_parse_error : public std::exception {
 	std::string err_;
@@ -68,4 +68,4 @@ namespace sgls {
 	json11::Json value;
     };
      
-} // namespace sgls
+} // namespace lfs

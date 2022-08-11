@@ -6,41 +6,52 @@
 
 void server_config::init(data& c)
 {
-    c.host = std::getenv("LFS_HOST");
+    const char* host;
+    const char* user;
+    const char* passwd;
+    const char* file_directory;
+    const char* port;
+    
+    host = std::getenv("LFS_HOST");
 
-    if (c.host == nullptr) {
+    if (host == nullptr) {
 	throw config_error {"The environment variable LFS_HOST is mandatory."};
     }
     
-    c.user = std::getenv("LFS_ADMINUSER");
+    user = std::getenv("LFS_ADMINUSER");
 
-    if (c.user == nullptr) {
+    if (user == nullptr) {
 	throw config_error {"The environment variable LFS_ADMINUSER is mandatory."};
     }
     
-    c.passwd = std::getenv("LFS_ADMINPASSWD");
+    passwd = std::getenv("LFS_ADMINPASSWD");
 
-    if (c.passwd == nullptr) {
+    if (passwd == nullptr) {
 	throw config_error {"The environment variable LFS_ADMINPASSWD is mandatory."};
     }
 
-    const auto port_temp = std::getenv("LFS_PORT");
+    port = std::getenv("LFS_PORT");
 
-    if (port_temp == nullptr) {
+    if (port == nullptr) {
 	throw config_error {"The environment variable LFS_PORT is mandatory."};
     }
     
     try {
-	c.port = std::stoi(port_temp);
+	c.port = std::stoi(port);
     } catch (const std::invalid_argument&) {
 	throw config_error {"Could not convert port string to number because it contains a non-numeric character."};
     } catch (const std::out_of_range&) {
 	throw config_error {"Could not convert port string to number because the number might be too large."};
     }
     
-    c.file_directory = std::getenv("LFS_FILE_DIRECTORY");
+    file_directory = std::getenv("LFS_FILE_DIRECTORY");
 
-    if (c.file_directory == nullptr) {
+    if (file_directory == nullptr) {
 	throw config_error {"The environment variable LFS_FILE_DIRECTORY is mandatory."};
     }
+
+    c.host = host;
+    c.user = user;
+    c.passwd = passwd;
+    c.file_directory = file_directory;
 }

@@ -3,7 +3,7 @@
 
 #include "server_config.h"
 #include "httplib.h"
-// #include "simple_git_lfs.h"
+#include "simple_git_lfs.h"
 
 int main()
 {
@@ -17,16 +17,23 @@ int main()
 	
 	httplib::Server server;
 	
+	server.Post("/objects/batch", [&cfg](const auto& request, auto& response) {
+	    lfs::batch_request_handler(request, response, cfg);
+	});
+
+	server.Get(R"(/objects/[a-zA-Z0-9]*$)", [&cfg](const auto& request, auto& response) {
+	    lfs::download_handler(request, response, cfg);
+	});
+
+	server.Put(R"(/objects/[a-zA-Z0-9]*$)", [&cfg](const auto& request, auto& response) {
+	    lfs::upload_handler(request, response, cfg);
+	});
+	
+	server.listen(cfg.host, cfg.port);
     } catch (const std::exception& e) {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
-
-    // server.Post("/objects/batch", sgls::batch_request_handler);
-    // server.Get(R"(/objects/[a-zA-Z0-9]*$)", sgls::download_handler);
-    // server.Put(R"(/objects/[a-zA-Z0-9]*$)", sgls::upload_handler);
-    
-    // server.listen(config::host, config::port);
 
     return EXIT_SUCCESS;
 }
