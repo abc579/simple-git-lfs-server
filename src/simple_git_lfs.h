@@ -1,16 +1,10 @@
 #pragma once
 
+#include <string>
+
 #include "httplib.h"
 #include "json.h"
 #include "server_config.h"
-
-#include <unordered_map>
-#include <fstream>
-#include <iostream>
-#include <iterator>
-#include <algorithm>
-#include <sys/stat.h>
-#include <cstdint>
 
 namespace lfs {
 

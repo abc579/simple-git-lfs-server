@@ -1,0 +1,17 @@
+* Base64 Code Snippet
+
+I am using a code snippet to decode a string in base64 format.
+
+Source: StackOverFlow... FIXME.
+
+* Http Server Library
+
+I am using an http server library.
+
+Source: https://github.com/yhirose/cpp-httplib
+
+* Json Library
+
+I am using an json library.
+
+Source: https://github.com/dropbox/json11

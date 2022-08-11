@@ -1,4 +1,3 @@
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <ios>
@@ -8,6 +7,8 @@
 #include <sstream>
 #include <exception>
 #include <algorithm>
+#include <sys/stat.h>
+#include <cstdint>
 
 #include "json11.hpp"
 #include "simple_git_lfs.h"

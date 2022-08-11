@@ -32,11 +32,15 @@ out/json11.o :
 out/base64.o :
 	$(CXX) $(CXXFLAGS) -c inc/base64.cpp -o out/base64.o
 
-out :
+build :
 	mkdir -p $(OUT)
 
 run :
 	./$(MAINT)
+
+clean :
+	rm -rf $(OUT)
+	rm test/test_env
 
 # If there is a target called clean/all/run then GNUmake could be confused, so we
 # will avoid that, just in case.
