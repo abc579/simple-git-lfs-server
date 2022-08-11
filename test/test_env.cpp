@@ -21,8 +21,7 @@ void run(const std::unordered_map<std::string, std::string>& env, const std::str
 
     try {
 	std::cout << "Checking " << checking << " environment variable...";
-	server_config::data cfg;
-	server_config::init(cfg);
+	server_config::data cfg = server_config::init();
 	std::cout << " error! The server was supposed to stop if " << checking << " is NULL.";
 	assert(false);
     } catch(server_config::config_error&) {

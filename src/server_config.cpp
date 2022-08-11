@@ -4,8 +4,10 @@
 #include <iostream>
 #include <exception>
 
-void server_config::init(data& c)
+server_config::data server_config::init()
 {
+    data c;
+    
     const char* host;
     const char* user;
     const char* passwd;
@@ -54,4 +56,6 @@ void server_config::init(data& c)
     c.user = user;
     c.passwd = passwd;
     c.file_directory = file_directory;
+
+    return c;
 }

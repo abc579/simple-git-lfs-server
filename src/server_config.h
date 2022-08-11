@@ -24,5 +24,5 @@ namespace server_config {
 	std::string download_object_path {"/objects/"};
     };
 
-    void init(data&);
+    data init();
 }

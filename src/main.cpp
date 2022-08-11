@@ -8,8 +8,7 @@
 int main()
 {
     try {
-	server_config::data cfg;
-	server_config::init(cfg);
+	const server_config::data cfg {server_config::init()};
 	
 	// Avoid significant C I/O overhead: we are not going to use C I/O and
 	// we still care about performance.
