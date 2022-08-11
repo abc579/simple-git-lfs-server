@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <ios>
 #include <iterator>
+#include <stdexcept>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -21,8 +22,10 @@ void lfs::batch_request_handler(const request_t& request, response_t& response, 
         auto req = json(request.body);
         create_batch_response(req, response, cfg);
     } catch (const json_parse_error& jpe) {
-        throw jpe;		// @FIXME(lev): we cannot throw here, instead, send an http response.
+	throw std::runtime_error(jpe.what());
     }
+    
+    response.status = static_cast<int>(http_response_codes::ok);
 }
 
 // In this case, the OID comes in the URL, so we have to extract that and

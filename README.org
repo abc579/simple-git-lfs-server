@@ -68,3 +68,14 @@ std::multimap with 8 elements = {
 Request.target: /objects/c9c9803e19adb2d139ad00b54f4af71f80c2b2530b10828a913b5b82c18559b8
 
 Request.body: binary raw
+
+* Validation codes covered
+
+** DONE 404 - The object does not exist on the server.
+** 409 - The specified hash algorithm disagrees with the server's acceptable options.
+** 410 - The object was removed by the owner.
+** 422 - Validation error.
+** 401 - The authentication credentials are needed, but were not sent. Git LFS will attempt to get the authentication for the request and retry immediately.
+** 403 - The user has read, but not write access. Only applicable when the operation in the request is "upload."
+** 404 - The Repository does not exist for the user.
+** 422 - Validation error with one or more of the objects in the request. This means that none of the requested objects to upload are valid.

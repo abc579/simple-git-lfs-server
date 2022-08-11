@@ -14,7 +14,8 @@ namespace lfs {
     
     enum class http_response_codes {
 	ok = 200,
-	auth_required_but_not_given = 401
+	auth_required_but_not_given = 401,
+	validation_error = 422
     };
     
     enum class object_error_codes {
