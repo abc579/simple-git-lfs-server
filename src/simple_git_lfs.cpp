@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <cstdint>
 
+#include "json.h"
 #include "json11.hpp"
 #include "simple_git_lfs.h"
 #include "server_config.h"
@@ -20,12 +21,127 @@ void lfs::batch_request_handler(const request_t& request, response_t& response, 
 {
     try {
         auto req = json(request.body);
-        create_batch_response(req, response, cfg);
+        process_batch_request(req, response, cfg);
     } catch (const json_parse_error& jpe) {
-	throw std::runtime_error(jpe.what());
+	throw jpe;
     }
-    
+
     response.status = static_cast<int>(http_response_codes::ok);
+}
+
+void lfs::process_batch_request(const json& request, response_t& response, const server_config::data& cfg)
+{
+    const auto objects = request.get_array_items("objects");
+
+    // @NOTE(lev): API is silent about this, but since there is no
+    // reasonable thing to do, we will throw an exception.
+    if (objects.empty()) {
+	throw json_parse_error {"`objects` key is mandatory."};
+    }
+
+    auto temp_op = request.get_string_value("operation");
+
+    // @NOTE(lev): again, the API does not tell what to do if the request
+    // does not specify the operation or the operation is not download or upload.
+    // In our case, we are going to assume that the client wants to download.
+    if (temp_op.empty() || (temp_op != "download" && temp_op != "upload")) {
+	temp_op = "download";
+    }
+
+    const auto operation = temp_op;
+
+    batch_response br {create_batch_response(operation, objects, cfg)};
+
+    response.set_header("Accept", accept_lfs);
+
+    response.set_content(encode_batch_response(br, operation), content_type_lfs);
+    response.status = static_cast<int>(http_response_codes::ok);
+}
+
+lfs::batch_response lfs::create_batch_response(const std::string& operation, const json_array_t& objects,
+					       const server_config::data& cfg)
+{
+    static const error_object error {"Object does not exist.", static_cast<int>(object_error_codes::not_found)};
+
+    batch_response br;
+
+    if (operation == "download") {
+	for (const auto& o : objects) {
+	    const auto oid = o["oid"].string_value();
+	    const auto size = o["size"].int_value();
+
+	    batch_object bo {oid, size};
+
+	    // Check if the oid is not empty and then if it exists in the file system.
+	    if (oid.empty() || !can_open(get_filesystem_path(oid, cfg.file_directory))) {
+		br.objects.push_back({bo, {}, error});
+		continue;
+	    }
+
+	    // If the size does not come in the request or they specified 0, obtain it.
+	    if (size == 0) {
+		bo.size = get_file_size(get_filesystem_path(oid, cfg.file_directory));
+	    }
+
+	    operation_object actions {cfg.host + cfg.download_object_path + bo.oid};
+	    br.objects.push_back({bo, actions, {}});
+	}
+    } else if (operation == "upload") {
+	for (const auto& o : objects) {
+	    batch_object bo {o["oid"].string_value(),
+			     o["size"].int_value()};
+
+            operation_object actions = {cfg.host + cfg.upload_object_path + bo.oid};
+
+	    br.objects.push_back({bo, actions, {}});
+	}
+    }
+
+    return br;
+}
+
+std::string lfs::encode_batch_response(const batch_response& br, const std::string& operation)
+{
+    json_object_t j = {
+        { "transfer", br.transfer },
+        { "hash_algo", hash_algo }
+    };
+
+    json_array_t object_array;
+
+    for (const auto& o : br.objects) {
+        json_object_t jtemp;
+
+        if (o.error.message.empty()) {
+            jtemp = {
+                { "oid", o.object.oid },
+                { "size", o.object.size},
+                {   "actions", json_object_t {
+                        {   operation, json_object_t {
+                                { "href", o.actions.href }
+                            }
+                        }
+                    }
+                }
+            };
+        } else {
+            jtemp = {
+                { "oid", o.object.oid},
+                { "size", o.object.size},
+                {   "error", json_object_t {
+                        { "code", o.error.code},
+                        { "message", o.error.message}
+                    }
+                }
+            };
+        }
+
+        object_array.push_back(jtemp);
+    }
+
+    j["objects"] = object_array;
+
+    return json_t(j).dump();
 }
 
 // In this case, the OID comes in the URL, so we have to extract that and
@@ -47,95 +163,6 @@ void lfs::download_handler(const request_t& request, response_t& response, const
     response.status = (int) http_response_codes::ok;
 }
 
-// We got a client request, which contains all the objects that the clients
-// wants to get. Here we check for each object if it exists and act accordingly,
-// that is, creating a response by filling the RESPONSE parameter.
-void lfs::create_batch_response(const json& request, response_t& response, const server_config::data& cfg)
-{
-    static const error_object error {"Object does not exist.", (int) object_error_codes::not_found};
-    
-    response.set_header("Content-Type", content_type_lfs);
-    response.set_header("Accept", accept_lfs);
-    
-    batch_response br;
-
-    const auto objects = request.get_array_items("objects");
-    const auto operation = request.get_string_value("operation");
-
-    if (operation == "download") {
-	for (const auto& object : objects) {
-	    const auto oid = object["oid"].string_value();
-	    batch_object bo {oid, object["size"].int_value()};
-	
-	    if (can_open(get_filesystem_path(oid, cfg.file_directory))) {
-		operation_object actions = {cfg.host + cfg.download_object_path + oid};
-		br.objects.push_back({bo, actions, {}});
-	    } else {
-		br.objects.push_back({bo, {}, error});
-	    }
-	}
-    } else if (operation == "upload") {
-	// We do the same thing whether the object exists or not. The API
-	// does not offer a lot of light in this case. For now we are doing the
-	// same thing as the git lfs server offered as example made in Go.
-	for (const auto& object : objects) {
-	    const auto oid = object["oid"].string_value();
-	    batch_object bo {oid, object["size"].int_value()};
-
-	    operation_object actions = {cfg.host + cfg.upload_object_path + oid};
-
-	    br.objects.push_back({bo, actions, {}});
-	}
-    }
-    
-    response.set_content(encode_batch_response(br, operation), "application/json");
-    response.status = (int) http_response_codes::ok;
-}
-
-std::string lfs::encode_batch_response(const batch_response& br, const std::string& operation)
-{
-    auto j = json11::Json::object {
-        { "transfer", br.transfer },
-        { "hash_algo", hash_algo }
-    };
-
-    auto object_array = json11::Json::array();
-
-    for (const auto& o : br.objects) {
-        json11::Json::object jtemp;
-
-        if (o.error.message.empty()) {
-            jtemp = {
-                { "oid", o.object.oid },
-                { "size", o.object.size},
-                {   "actions", json11::Json::object {
-                        {   operation, json11::Json::object {
-                                { "href", o.actions.href }
-                            }
-                        }
-                    }
-                }
-            };
-        } else {
-            jtemp = {
-                { "oid", o.object.oid},
-                { "size", o.object.size},
-                {   "error", json11::Json::object {
-                        { "code", o.error.code},
-                        { "message", o.error.message}
-                    }
-                }
-            };
-        }
-
-        object_array.push_back(jtemp);
-    }
-
-    j["objects"] = object_array;
-
-    return json11::Json(j).dump();
-}
-
 bool lfs::can_open(const std::string& path)
 {
     std::ifstream ifs (path, std::ios::in | std::ios::binary);
@@ -150,11 +177,11 @@ size_t lfs::get_file_size(const std::string& path)
 	return 0;		// @TODO: Do better.
     }
 
-    std::ifstream file (path, std::ios::binary);
+    std::ifstream file (path, std::ios::in | std::ios::binary);
     file.unsetf(std::ios::skipws);
     file.seekg(0, std::ios::end);
     auto file_size = file.tellg();
-    
+
     return file_size;
 }
 
@@ -240,13 +267,13 @@ bool lfs::auth_ok(const request_t& request, const server_config::data& cfg)
     if (auth.find(prefix) == std::string::npos) {
 	return false;
     }
-    
+
     const auto credentials = parse_b64_auth(auth, prefix);
 
     if (credentials.user.empty()) {
 	return false;
     }
-    
+
     return authenticate(credentials, cfg);
 }
 
@@ -259,7 +286,7 @@ lfs::user_data lfs::parse_b64_auth(const std::string& auth, const std::string& p
     if (encoded_auth.empty()) {
 	return {"", ""};
     }
-    
+
     const auto decoded_auth = base64_decode(encoded_auth);
     const auto colon_pos = decoded_auth.find(':');
 

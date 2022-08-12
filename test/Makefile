@@ -1,15 +1,20 @@
-SOURCES = $(wildcard *.cpp)
-EXECUTABLE = $(SOURCES:.cpp=.test)
+# SOURCES = $(wildcard *.cpp)
+EXECUTABLES = $(wildcard *.test)
+CXX = g++
 LDFLAGS =
-CXXFLAGS = -std=c++14 -O2 -Wall -Werror -Wextra -Wpedantic -fsanitize=address -I../src -I../inc
+CXXFLAGS = -std=c++14 -g3 -I../src -I../inc
+# INCS = $(wildcard ../inc/*.cpp)
+# INCS_EXE = $(INCS:.cpp=.o)
 
-all : $(EXECUTABLE)
+all :
+	$(CXX) $(CXXFLAGS) test_env.cpp ../src/server_config.cpp -o test_env.test
+	$(CXX) $(CXXFLAGS) test_auth.cpp ../src/server_config.cpp ../src/simple_git_lfs.cpp ../inc/base64.cpp ../inc/httplib.cpp ../inc/json11.cpp -o test_auth.test
+	$(CXX) $(CXXFLAGS) test_batch_request.cpp ../src/server_config.cpp ../src/simple_git_lfs.cpp ../inc/base64.cpp ../inc/httplib.cpp ../inc/json11.cpp -o test_batch_request.test
 
-$(EXECUTABLE) : $(SOURCES)
-	$(CXX) $< $(LDFLAGS) $(CXXFLAGS) ../src/server_config.cpp -o $@
+clean :
+	rm *.test
 
-clean:
-	rm $(EXECUTABLE)
-
-run : $(EXECUTABLE)
+run : $(EXECUTABLES)
 	for i in $^; do echo $$i; ./$$i || exit 1; echo; done
+
+.PHONY : clean

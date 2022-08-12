@@ -25,7 +25,7 @@ void run(const std::unordered_map<std::string, std::string>& env, const std::str
 	std::cout << " error! The server was supposed to stop if " << checking << " is NULL.";
 	assert(false);
     } catch(server_config::config_error&) {
-	std::cout << " ok!" << std::endl;
+	std::cout << " ok" << std::endl;
 	assert(true);
     }
 }
@@ -71,6 +71,8 @@ int main()
     check_lfs_admin_pass();
     check_lfs_file_directory();
     check_lfs_port();
-    
+
+    std::cout << "All fine!" << std::endl;
+
     return EXIT_SUCCESS;
 }

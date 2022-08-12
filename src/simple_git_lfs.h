@@ -4,6 +4,7 @@
 
 #include "httplib.h"
 #include "json.h"
+#include "json11.hpp"
 #include "server_config.h"
 
 namespace lfs {
@@ -11,13 +12,13 @@ namespace lfs {
     const std::string content_type_lfs {"application/vnd.git-lfs+json"};
     const std::string hash_algo {"sha256"};
     const std::string accept_lfs {"application/vnd.git-lfs"};
-    
+
     enum class http_response_codes {
 	ok = 200,
 	auth_required_but_not_given = 401,
 	validation_error = 422
     };
-    
+
     enum class object_error_codes {
 	not_found = 404
     };
@@ -27,7 +28,8 @@ namespace lfs {
     //       "header": {
     //         "Key": "value"
     //       },
-    //       "expires_at": "2016-11-10T15:29:07Z"
+    //       "expires_at": "2016-11-10T15:29:07Z",
+    //       "expires_in": 10
     // }
     struct operation_object {
 	std::string href;
@@ -37,7 +39,7 @@ namespace lfs {
     // "error": {
     //     "code": 404,
     //     "message": "Object does not exist"
-    //   }
+    // }
     struct error_object {
 	std::string message;
 	int code;
@@ -63,7 +65,7 @@ namespace lfs {
 	std::string child_dir;
 	std::string oid;
     };
-    
+
     struct batch_response_object {
 	batch_object object;
 	operation_object actions;
@@ -105,6 +107,10 @@ namespace lfs {
     using request_t = httplib::Request;
     using response_t = httplib::Response;
 
+    using json_t = json11::Json;
+    using json_object_t = json11::Json::object;
+    using json_array_t  = json11::Json::array;
+
     // Handlers.
     void batch_request_handler(const request_t&, response_t&, const server_config::data&);
     void download_handler(const request_t&, response_t&, const server_config::data&);
@@ -112,10 +118,12 @@ namespace lfs {
 
     // Auth.
     bool auth_ok(const request_t&, const server_config::data&);
-    
+
     // Utility functions.
-    void create_batch_response(const json&, response_t&, const server_config::data&);
+    void process_batch_request(const json&, response_t&, const server_config::data&);
+    batch_response create_batch_response(const std::string&, const json_array_t&, const server_config::data&);
     std::string encode_batch_response(const batch_response&, const std::string&);
+
     bool can_open(const std::string&);
     size_t get_file_size(const std::string&);
     int create_directory(const std::string&);

@@ -28,7 +28,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [] Implement range http request for download operations.
 + [X] Split headers and .cpp files.
 + [] There are some things hard to refactor, for instance, some JSON stuff like creating an object which is actually a typedef; the http server, et cetera. I am going to leave this for the end.
-+ [] Test for errors.
++ [X] Test for errors.
 + [] Support verification request.
 + [] Support all error codes.
 + [] Change b64 algorithm.
@@ -41,7 +41,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - [] How do people manage dependencies in C++? I do have two for now and the way I proceeded does not look promising. I saw some like conan.io, vcpkg, etc.
 - [] How do people structure source code and header files? Project scaffolding.
 - [] How can we speed compilation times?
-  
+
 * Not supported.
 
 - Ref property.
