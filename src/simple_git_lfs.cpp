@@ -170,34 +170,9 @@ std::string lfs::get_filesystem_path(const std::string& oid, const std::string& 
     return file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir + '/' + oid_data.oid;
 }
 
-// We will get something like this: "Authorization" = "Basic dGVtcDp0ZW1w".
-// Notice that the string has Base64 encoding.
-void lfs::upload_handler(const request_t& request, response_t& response, const server_config::data& cfg)
+void lfs::upload_handler(const request_t& request, response_t&, const server_config::data& cfg)
 {
-    const std::string prefix {"Basic "};
-    const auto encoded_auth = request.headers.find("Authorization"); // It is encoded in Base64.
-
-    user_data data = [&encoded_auth, &prefix]() -> user_data {
-	if (encoded_auth->second.find(prefix) == std::string::npos) {
-	    std::cerr << "Something weird happened: we cannot find the base64 string in the request." << std::endl;
-	    return {};
-	}
-	
-	const auto decoded_auth = base64_decode(encoded_auth->second.substr(prefix.length()));
-	const auto colon_pos = decoded_auth.find(':');
-
-	return {decoded_auth.substr(0, colon_pos), decoded_auth.substr(colon_pos + 1)};
-    } ();
-
-    // All good, continue and save file.
-    // @TODO: We should have support for more than one user in the future.
-    if (data.user == cfg.user && data.passwd == cfg.passwd) {
-	save_file_in_directory(get_oid_from_url(request.target), request.body, cfg);
-    } else {
-	response.set_header("Content-Type", content_type_lfs);
-	response.status = (int) http_response_codes::auth_required_but_not_given;
-	response.set_content(R"({ "message": "Credentials needed", "documentation_url": "https://lfs-server.com/docs/errors"})", "application/json");
-    }
+    save_file_in_directory(get_oid_from_url(request.target), request.body, cfg);
 }
 
 std::string lfs::get_oid_from_url(const std::string& url)
@@ -249,4 +224,49 @@ bool lfs::directory_exists(const std::string& path)
     }
 
     return false;
+}
+
+// Right now we only suport Basic auth.
+// See RFC 2617, Section 2.
+bool lfs::auth_ok(const request_t& request, const server_config::data& cfg)
+{
+    const auto auth = request.get_header_value("Authorization");
+    const std::string prefix {"Basic "};
+
+    if (auth.empty()) {
+	return false;
+    }
+
+    if (auth.find(prefix) == std::string::npos) {
+	return false;
+    }
+    
+    const auto credentials = parse_b64_auth(auth, prefix);
+
+    if (credentials.user.empty()) {
+	return false;
+    }
+    
+    return authenticate(credentials, cfg);
+}
+
+// AUTH will be something like this: "Basic dGVtcDp0ZW1w"
+// PREFIX is Basic.
+lfs::user_data lfs::parse_b64_auth(const std::string& auth, const std::string& prefix)
+{
+    const auto encoded_auth = auth.substr(prefix.length());
+
+    if (encoded_auth.empty()) {
+	return {"", ""};
+    }
+    
+    const auto decoded_auth = base64_decode(encoded_auth);
+    const auto colon_pos = decoded_auth.find(':');
+
+    return {decoded_auth.substr(0, colon_pos), decoded_auth.substr(colon_pos + 1)};
+}
+
+bool lfs::authenticate(const lfs::user_data& credentials, const server_config::data& cfg)
+{
+    return credentials.user == cfg.user && credentials.passwd == cfg.passwd;
 }

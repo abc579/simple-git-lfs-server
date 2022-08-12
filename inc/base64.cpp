@@ -1,7 +1,6 @@
 #include "base64.h"
 
-// 
-std::string base64_decode(const std::string &in) {
+std::string base64_decode(const std::string& in) {
 
     std::string out;
 

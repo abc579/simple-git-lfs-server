@@ -110,6 +110,9 @@ namespace lfs {
     void download_handler(const request_t&, response_t&, const server_config::data&);
     void upload_handler(const request_t&, response_t&, const server_config::data&);
 
+    // Auth.
+    bool auth_ok(const request_t&, const server_config::data&);
+    
     // Utility functions.
     void create_batch_response(const json&, response_t&, const server_config::data&);
     std::string encode_batch_response(const batch_response&, const std::string&);
@@ -121,4 +124,6 @@ namespace lfs {
     void save_file_in_directory(const std::string&, const std::string&, const server_config::data&);
     oid_directory split_oid(const std::string&);
     bool directory_exists(const std::string&);
+    user_data parse_b64_auth(const std::string&, const std::string&);
+    bool authenticate(const user_data&, const server_config::data&);
 }
