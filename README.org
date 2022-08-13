@@ -28,9 +28,10 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] Split headers and .cpp files.
 + [X] Test for errors.
 + [X] Fix upload bug.
++ [] Implement range http request for download operations.
++ [] Test with big file sizes.
 + [] Convert http to https server.
 + [] Refactor.
-+ [] Implement range http request for download operations.
 + [] Support all error codes.
 + [] Change b64 algorithm.
 
