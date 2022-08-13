@@ -64,6 +64,7 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation, con
 
     batch_response br;
 
+    // @TODO(lev): create function to get href.
     if (operation == "download") {
 	for (const auto& o : objects) {
 	    const auto oid = o["oid"].string_value();
@@ -246,9 +247,10 @@ std::string lfs::get_filesystem_path(const std::string& file_directory, const st
     return file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir + '/' + oid_data.oid;
 }
 
-void lfs::upload_handler(const request_t& request, response_t& response, const server_config::data& cfg)
+void lfs::upload_handler(const request_t& request, response_t& response, const server_config::data& cfg,
+			 lfs::log& logger)
 {
-    save_file_in_directory(get_oid_from_url(request.target), request.body, cfg);
+    save_file_in_directory(get_oid_from_url(request.target), request.body, cfg, logger);
     response.status = static_cast<int>(http_response_codes::ok);
 }
 
@@ -280,24 +282,29 @@ lfs::oid_directory lfs::split_oid(const std::string& oid)
     };
 }
 
-void lfs::save_file_in_directory(const std::string& oid, const std::string& raw, const server_config::data& cfg)
+void lfs::save_file_in_directory(const std::string& oid, const std::string& raw, const server_config::data& cfg,
+				 lfs::log& logger)
 {
     const auto oid_data = split_oid(oid);
 
     if (!directory_exists(cfg.file_directory + '/' + oid_data.parent_dir)) {
-	if (create_directory(cfg.file_directory + '/' + oid_data.parent_dir) == -1) { // @FIXME: Error handling.
-	    std::cerr << "Could not create directory " << oid_data.parent_dir << std::endl;
+	if (create_directory(cfg.file_directory + '/' + oid_data.parent_dir) == -1) {
+	    std::stringstream ss;
+	    ss << "Could not create directory " << oid_data.parent_dir;
+	    logger.log_message(ss.str());
 	}
     }
 
     if (!directory_exists(cfg.file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir)) {
-	if (create_directory(cfg.file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir) == -1) { // @FIXME: Error handling.
-	    std::cerr << "Could not create directory " << oid_data.child_dir << std::endl;
+	if (create_directory(cfg.file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir) == -1) {
+	    std::stringstream ss;
+	    ss << "Could not create directory " << oid_data.child_dir;
+	    logger.log_message(ss.str());
 	}
     }
 
     // This could be optimized so we do not call two times to split_oid.
-    std::ofstream file {get_filesystem_path(oid, cfg.file_directory), std::ios::out | std::ios::binary};
+    std::ofstream file {get_filesystem_path(cfg.file_directory, oid), std::ios::out | std::ios::binary};
     std::vector<unsigned char> raw_vec {raw.begin(), raw.end()};
     file.write(reinterpret_cast<char *>(&raw_vec.front()), sizeof(unsigned char) * raw_vec.size());
 }
@@ -319,10 +326,6 @@ bool lfs::directory_exists(const std::string& path)
 // See RFC 2617, Section 2.
 bool lfs::auth_ok(const request_t& request, const server_config::data& cfg)
 {
-    static int times {1};
-
-    std::cout << "Inside Auth!" << times++ << std::endl;
-
     const auto auth = request.get_header_value("Authorization");
     const std::string prefix {"Basic "};
 
@@ -338,10 +341,6 @@ bool lfs::auth_ok(const request_t& request, const server_config::data& cfg)
 
     if (credentials.user.empty()) {
 	return false;
-    }
-
-    if (authenticate(credentials, cfg)) {
-	std::cout << "Auth ok!!!!!1" << std::endl;
     }
 
     return authenticate(credentials, cfg);

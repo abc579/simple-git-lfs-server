@@ -4,6 +4,7 @@
 #include "server_config.h"
 #include "httplib.h"
 #include "simple_git_lfs.h"
+#include "logger.h"
 
 #define AUTH_ERROR R"({ "message": "Credentials needed", "documentation_url": "https://lfs-server.com/docs/errors"})"
 
@@ -15,6 +16,7 @@ int main()
 
     try {
 	const server_config::data cfg {server_config::init()};
+	lfs::log logger;
 
 	// Avoid significant C I/O overhead: we are not going to use C I/O and
 	// we still care about performance.
@@ -41,7 +43,6 @@ int main()
 		response.status = static_cast<int>(lfs::http_response_codes::auth_required_but_not_given);
 		response.set_content(AUTH_ERROR, lfs::content_type_lfs);
 	    }
-	    std::cout << "Sending this payload to the client: " << response.body << std::endl;
 	});
 
 	server.Get(R"(/objects/[a-zA-Z0-9]*)", [&cfg](const auto& request, auto& response) {
@@ -53,13 +54,9 @@ int main()
 	    }
 	});
 
-	server.Put(R"(/[a-zA-Z0-9]*)", [&cfg](const auto& request, auto& response) {
-	    std::cout << "Someone is invoking upload PUT request!" << std::endl;
-	    std::cout << "Payload of request: " << request.body << std::endl;
+	server.Put(R"(/[a-zA-Z0-9]*)", [&cfg, &logger](const auto& request, auto& response) {
 	    if (lfs::auth_ok(request, cfg)) {
-		std::cout << "Calling upload handler!!!!" << std::endl;
-		lfs::upload_handler(request, response, cfg);
-		std::cout << "Done upload handler!!!!" << std::endl;
+		lfs::upload_handler(request, response, cfg, logger);
 	    } else {
 		response.status = static_cast<int>(lfs::http_response_codes::auth_required_but_not_given);
 		response.set_content(AUTH_ERROR, lfs::content_type_lfs);

@@ -24,12 +24,13 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] Implement upload operation.
 + [X] Reduce compilation time. Improve GNUMake file.
 + [X] Support verification request.
-+ [] Implement range http request for download operations.
-+ [] Convert http to https server.
 + [X] Setup authentication.
 + [X] Split headers and .cpp files.
-+ [] Refactor.
 + [X] Test for errors.
++ [X] Fix upload bug.
++ [] Convert http to https server.
++ [] Refactor.
++ [] Implement range http request for download operations.
 + [] Support all error codes.
 + [] Change b64 algorithm.
 

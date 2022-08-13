@@ -5,6 +5,7 @@
 #include "httplib.h"
 #include "json.h"
 #include "json11.hpp"
+#include "logger.h"
 #include "server_config.h"
 
 namespace lfs {
@@ -128,7 +129,7 @@ namespace lfs {
     // Handlers.
     void batch_request_handler(const request_t&, response_t&, const server_config::data&);
     void download_handler(const request_t&, response_t&, const server_config::data&);
-    void upload_handler(const request_t&, response_t&, const server_config::data&);
+    void upload_handler(const request_t&, response_t&, const server_config::data&, lfs::log&);
     void verify_handler(const request_t&, response_t&, const server_config::data&);
 
     // Auth.
@@ -145,7 +146,8 @@ namespace lfs {
     int create_directory(const std::string&);
     std::string get_filesystem_path(const std::string&, const std::string&);
     std::string get_oid_from_url(const std::string&);
-    void save_file_in_directory(const std::string&, const std::string&, const server_config::data&);
+    void save_file_in_directory(const std::string&, const std::string&, const server_config::data&,
+				lfs::log& logger);
     oid_directory split_oid(const std::string&);
     bool directory_exists(const std::string&);
     user_data parse_b64_auth(const std::string&, const std::string&);
