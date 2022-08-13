@@ -30,7 +30,7 @@ namespace lfs {
     struct verify_object {
 	header_object header;
 	std::string href;
-	const std::string expires_in {"86400"};
+	const int expires_in {86400};
     };
 
     // {
@@ -51,7 +51,7 @@ namespace lfs {
 	verify_object verify;
 	header_object header;
 	std::string href;
-	const std::string expires_in {"86400"};
+	const int expires_in {86400};
     };
 
     // "error": {
@@ -88,6 +88,7 @@ namespace lfs {
 	batch_object object;
 	operation_object actions;
 	error_object error;
+	const bool authenticated {true};
     };
 
     struct batch_client_post_request {
@@ -128,6 +129,7 @@ namespace lfs {
     void batch_request_handler(const request_t&, response_t&, const server_config::data&);
     void download_handler(const request_t&, response_t&, const server_config::data&);
     void upload_handler(const request_t&, response_t&, const server_config::data&);
+    void verify_handler(const request_t&, response_t&, const server_config::data&);
 
     // Auth.
     bool auth_ok(const request_t&, const server_config::data&);

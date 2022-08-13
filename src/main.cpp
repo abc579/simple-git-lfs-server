@@ -22,6 +22,8 @@ int main()
 
 	Server server;
 
+	// server.set_payload_max_length(1024 * 1024 * 512); // 512MB
+
 	// @NOTE(lev): the API does not specify what to do if something like parsing
 	// a JSON goes bad. I have tried the reference Go server and they just return
 	// a JSON with the key `objects` to NULL.
@@ -39,9 +41,10 @@ int main()
 		response.status = static_cast<int>(lfs::http_response_codes::auth_required_but_not_given);
 		response.set_content(AUTH_ERROR, lfs::content_type_lfs);
 	    }
+	    std::cout << "Sending this payload to the client: " << response.body << std::endl;
 	});
 
-	server.Get(R"(/objects/[a-zA-Z0-9]*$)", [&cfg](const auto& request, auto& response) {
+	server.Get(R"(/objects/[a-zA-Z0-9]*)", [&cfg](const auto& request, auto& response) {
 	    if (lfs::auth_ok(request, cfg)) {
 		lfs::download_handler(request, response, cfg);
 	    } else {
@@ -50,9 +53,22 @@ int main()
 	    }
 	});
 
-	server.Put(R"(/objects/[a-zA-Z0-9]*$)", [&cfg](const auto& request, auto& response) {
+	server.Put(R"(/[a-zA-Z0-9]*)", [&cfg](const auto& request, auto& response) {
+	    std::cout << "Someone is invoking upload PUT request!" << std::endl;
+	    std::cout << "Payload of request: " << request.body << std::endl;
 	    if (lfs::auth_ok(request, cfg)) {
+		std::cout << "Calling upload handler!!!!" << std::endl;
 		lfs::upload_handler(request, response, cfg);
+		std::cout << "Done upload handler!!!!" << std::endl;
+	    } else {
+		response.status = static_cast<int>(lfs::http_response_codes::auth_required_but_not_given);
+		response.set_content(AUTH_ERROR, lfs::content_type_lfs);
+	    }
+	});
+
+	server.Post("/verify", [&cfg](const auto& request, auto& response) {
+	    if (lfs::auth_ok(request, cfg)) {
+		lfs::verify_handler(request, response, cfg);
 	    } else {
 		response.status = static_cast<int>(lfs::http_response_codes::auth_required_but_not_given);
 		response.set_content(AUTH_ERROR, lfs::content_type_lfs);

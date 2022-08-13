@@ -3,7 +3,7 @@
 # Run this after `make`.
 
 LFS_HOST="localhost"
-LFS_PORT="8080"
+LFS_PORT="9999"
 LFS_FILE_DIRECTORY="files"
 LFS_ADMINUSER="temp"
 LFS_ADMINPASSWD="temp"

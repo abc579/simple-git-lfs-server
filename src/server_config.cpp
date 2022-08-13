@@ -66,5 +66,7 @@ server_config::data server_config::init()
     c.file_directory = file_directory;
     c.scheme = scheme;
 
+    lfs::create_directory(file_directory);
+
     return c;
 }

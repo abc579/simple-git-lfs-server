@@ -19,13 +19,9 @@
 
 void lfs::batch_request_handler(const request_t& request, response_t& response, const server_config::data& cfg)
 {
-    try {
-        auto req = json(request.body);
-	const auto auth = request.headers.find("Authorization")->second;
-        process_batch_request(req, response, cfg, auth);
-    } catch (const json_parse_error& jpe) {
-	throw jpe;
-    }
+    auto req = json(request.body);
+    const auto auth = request.headers.find("Authorization")->second;
+    process_batch_request(req, response, cfg, auth);
 
     response.status = static_cast<int>(http_response_codes::ok);
 }
@@ -89,7 +85,7 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation, con
 	    operation_object actions = {
 		{}, // Verify.
 		{authorization}, // Header.
-		get_href(cfg.scheme, cfg.host + cfg.download_object_path + bo.oid), // Href of operation.
+		get_href(cfg.scheme, cfg.host + ':' + std::to_string(cfg.port) + cfg.download_object_path + bo.oid), // Href of operation.
 	    };
 
 	    br.objects.push_back({bo, actions, {}});
@@ -102,10 +98,10 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation, con
 	    operation_object actions = {
 		{ // Verify.
 		    {authorization}, // Authorization.
-		    get_href(cfg.scheme, cfg.host + cfg.verify_object_path + bo.oid) // Href of verification.
+		    get_href(cfg.scheme, cfg.host + ':' + std::to_string(cfg.port) + cfg.verify_object_path) // Href of verification.
 		},
 		{authorization}, // Header.
-		get_href(cfg.scheme, cfg.host + cfg.upload_object_path + bo.oid), // Href of operation.
+		get_href(cfg.scheme, cfg.host + ':' + std::to_string(cfg.port) + cfg.upload_object_path + bo.oid), // Href of operation.
 	    };
 
 	    br.objects.push_back({bo, actions, {}});
@@ -135,6 +131,7 @@ std::string lfs::encode_batch_response(const batch_response& br, const std::stri
 		jtemp = {
 		    { "oid", o.object.oid },
 		    { "size", o.object.size},
+		    { "authenticated", o.authenticated },
 		    {   "actions", json_object_t {
 			    {   operation, json_object_t {
 				    { "href", o.actions.href },
@@ -161,6 +158,7 @@ std::string lfs::encode_batch_response(const batch_response& br, const std::stri
 		jtemp = {
 		    { "oid", o.object.oid },
 		    { "size", o.object.size},
+		    { "authenticated", o.authenticated },
 		    {   "actions", json_object_t {
 			    {   operation, json_object_t {
 				    { "href", o.actions.href },
@@ -254,6 +252,18 @@ void lfs::upload_handler(const request_t& request, response_t& response, const s
     response.status = static_cast<int>(http_response_codes::ok);
 }
 
+void lfs::verify_handler(const request_t& request, response_t& response, const server_config::data& cfg)
+{
+    const auto object = json(request.body);
+    const auto oid = object.get_string_value("oid");
+
+    if (!can_open(get_filesystem_path(cfg.file_directory, oid))) {
+	response.status = static_cast<int>(object_error_codes::not_found);
+    } else {
+	response.status = static_cast<int>(http_response_codes::ok);
+    }
+}
+
 std::string lfs::get_oid_from_url(const std::string& url)
 {
     const auto pos = url.find_last_of('/');
@@ -309,6 +319,10 @@ bool lfs::directory_exists(const std::string& path)
 // See RFC 2617, Section 2.
 bool lfs::auth_ok(const request_t& request, const server_config::data& cfg)
 {
+    static int times {1};
+
+    std::cout << "Inside Auth!" << times++ << std::endl;
+
     const auto auth = request.get_header_value("Authorization");
     const std::string prefix {"Basic "};
 
@@ -324,6 +338,10 @@ bool lfs::auth_ok(const request_t& request, const server_config::data& cfg)
 
     if (credentials.user.empty()) {
 	return false;
+    }
+
+    if (authenticate(credentials, cfg)) {
+	std::cout << "Auth ok!!!!!1" << std::endl;
     }
 
     return authenticate(credentials, cfg);

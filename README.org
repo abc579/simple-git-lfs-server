@@ -23,7 +23,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] The reason why it might not work is because we uploaded the file with Go.
 + [X] Implement upload operation.
 + [X] Reduce compilation time. Improve GNUMake file.
-+ [] Support verification request.
++ [X] Support verification request.
 + [] Implement range http request for download operations.
 + [] Convert http to https server.
 + [X] Setup authentication.
@@ -33,7 +33,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [] Support all error codes.
 + [] Change b64 algorithm.
 
-* Think about what you are doing!
+* Questions.
 
 - [] Investigate how opening a file works and understand it. For instance, why are we using a vector of unsigned chars? What is up with iterators?
 - [] What happens when we remove objects? Do they have to be deleted from the server too?
@@ -41,6 +41,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - [] How do people manage dependencies in C++? I do have two for now and the way I proceeded does not look promising. I saw some like conan.io, vcpkg, etc.
 - [] How do people structure source code and header files? Project scaffolding.
 - [] How can we speed compilation times?
+- [] Why does the API not require auth for the verify callback? Furthermore, the reference Go server crashes if the object does not exist... In our case, the auth is necessary for verify too.
 
 * Not supported.
 
@@ -50,25 +51,6 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - Authenticated property.
 - Expires at property.
 - LFS-Authenticate header in 401 responses.
-
-* Headers in UPLOAD operation.
-
-Request.headers:
-
-std::multimap with 8 elements = {
-    ["Accept-Encoding"] = "gzip",
-    ["Authorization"] = "Basic dGVtcDp0ZW1w",
-    ["Content-Length"] = "716800",
-    ["Content-Type"] = "application/octet-stream",
-    ["Host"] = "localhost:8080",
-    ["REMOTE_ADDR"] = "127.0.0.1",
-    ["REMOTE_PORT"] = "42464",
-    ["User-Agent"] = "git-lfs/3.2.0 (GitHub; linux amd64; go 1.18.2)"
-  },
-
-Request.target: /objects/c9c9803e19adb2d139ad00b54f4af71f80c2b2530b10828a913b5b82c18559b8
-
-Request.body: binary raw
 
 * Validation codes covered
 
