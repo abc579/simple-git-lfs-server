@@ -10,6 +10,7 @@
 #define LFS_ADMINPASSWD "LFS_ADMINPASSWD"
 #define LFS_FILE_DIRECTORY "LFS_FILE_DIRECTORY"
 #define LFS_PORT "LFS_PORT"
+#define LFS_SCHEME "LFS_SCHEME"
 
 void run(const std::unordered_map<std::string, std::string>& env, const std::string& checking)
 {
@@ -22,7 +23,6 @@ void run(const std::unordered_map<std::string, std::string>& env, const std::str
     try {
 	std::cout << "Checking " << checking << " environment variable...";
 	server_config::data cfg = server_config::init();
-	std::cout << " error! The server was supposed to stop if " << checking << " is NULL.";
 	assert(false);
     } catch(server_config::config_error&) {
 	std::cout << " ok" << std::endl;
@@ -64,6 +64,16 @@ void check_lfs_port()
 	}, LFS_PORT);
 }
 
+void check_lfs_scheme()
+{
+    run({{LFS_HOST, "dummy"},
+	 {LFS_ADMINUSER, "dummy"},
+	 {LFS_ADMINPASSWD, "dummy"},
+	 {LFS_FILE_DIRECTORY, "dummy"},
+	 {LFS_PORT, "8080"}
+	}, LFS_SCHEME);
+}
+
 int main()
 {
     check_lfs_host();
@@ -71,6 +81,7 @@ int main()
     check_lfs_admin_pass();
     check_lfs_file_directory();
     check_lfs_port();
+    check_lfs_scheme();
 
     std::cout << "All fine!" << std::endl;
 

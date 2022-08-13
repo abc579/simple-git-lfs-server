@@ -21,7 +21,8 @@ void lfs::batch_request_handler(const request_t& request, response_t& response, 
 {
     try {
         auto req = json(request.body);
-        process_batch_request(req, response, cfg);
+	const auto auth = request.headers.find("Authorization")->second;
+        process_batch_request(req, response, cfg, auth);
     } catch (const json_parse_error& jpe) {
 	throw jpe;
     }
@@ -29,7 +30,9 @@ void lfs::batch_request_handler(const request_t& request, response_t& response, 
     response.status = static_cast<int>(http_response_codes::ok);
 }
 
-void lfs::process_batch_request(const json& request, response_t& response, const server_config::data& cfg)
+void lfs::process_batch_request(const json& request, response_t& response,
+				const server_config::data& cfg,
+				const std::string& authorization)
 {
     const auto objects = request.get_array_items("objects");
 
@@ -50,7 +53,7 @@ void lfs::process_batch_request(const json& request, response_t& response, const
 
     const auto operation = temp_op;
 
-    batch_response br {create_batch_response(operation, objects, cfg)};
+    batch_response br {create_batch_response(operation, objects, cfg, authorization)};
 
     response.set_header("Accept", accept_lfs);
 
@@ -59,7 +62,7 @@ void lfs::process_batch_request(const json& request, response_t& response, const
 }
 
 lfs::batch_response lfs::create_batch_response(const std::string& operation, const json_array_t& objects,
-					       const server_config::data& cfg)
+					       const server_config::data& cfg, const std::string& authorization)
 {
     static const error_object error {"Object does not exist.", static_cast<int>(object_error_codes::not_found)};
 
@@ -73,17 +76,22 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation, con
 	    batch_object bo {oid, size};
 
 	    // Check if the oid is not empty and then if it exists in the file system.
-	    if (oid.empty() || !can_open(get_filesystem_path(oid, cfg.file_directory))) {
+	    if (oid.empty() || !can_open(get_filesystem_path(cfg.file_directory, oid))) {
 		br.objects.push_back({bo, {}, error});
 		continue;
 	    }
 
 	    // If the size does not come in the request or they specified 0, obtain it.
 	    if (size == 0) {
-		bo.size = get_file_size(get_filesystem_path(oid, cfg.file_directory));
+		bo.size = get_file_size(get_filesystem_path(cfg.file_directory, oid));
 	    }
 
-	    operation_object actions {cfg.host + cfg.download_object_path + bo.oid};
+	    operation_object actions = {
+		{}, // Verify.
+		{authorization}, // Header.
+		get_href(cfg.scheme, cfg.host + cfg.download_object_path + bo.oid), // Href of operation.
+	    };
+
 	    br.objects.push_back({bo, actions, {}});
 	}
     } else if (operation == "upload") {
@@ -91,7 +99,14 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation, con
 	    batch_object bo {o["oid"].string_value(),
 			     o["size"].int_value()};
 
-            operation_object actions = {cfg.host + cfg.upload_object_path + bo.oid};
+	    operation_object actions = {
+		{ // Verify.
+		    {authorization}, // Authorization.
+		    get_href(cfg.scheme, cfg.host + cfg.verify_object_path + bo.oid) // Href of verification.
+		},
+		{authorization}, // Header.
+		get_href(cfg.scheme, cfg.host + cfg.upload_object_path + bo.oid), // Href of operation.
+	    };
 
 	    br.objects.push_back({bo, actions, {}});
 	}
@@ -113,17 +128,53 @@ std::string lfs::encode_batch_response(const batch_response& br, const std::stri
         json_object_t jtemp;
 
         if (o.error.message.empty()) {
-            jtemp = {
-                { "oid", o.object.oid },
-                { "size", o.object.size},
-                {   "actions", json_object_t {
-                        {   operation, json_object_t {
-                                { "href", o.actions.href }
-                            }
-                        }
-                    }
-                }
-            };
+	    // @FIXME(lev): come with something better. The thing is that we have
+	    // to provide a "verify" field for uploads, not in downloads. The
+	    // rest is the same.
+	    if (operation == "upload") {
+		jtemp = {
+		    { "oid", o.object.oid },
+		    { "size", o.object.size},
+		    {   "actions", json_object_t {
+			    {   operation, json_object_t {
+				    { "href", o.actions.href },
+				    { "header", json_object_t {
+					    {"Authorization", o.actions.header.authorization}
+					}
+				    },
+				    { "expires_in", o.actions.expires_in},
+				    { "verify", json_object_t {
+					    { "href", o.actions.verify.href},
+					    { "header", json_object_t {
+						    { "Authorization", o.actions.verify.header.authorization}
+						}
+					    },
+					    { "expires_in", o.actions.verify.expires_in}
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		};
+	    } else {
+		jtemp = {
+		    { "oid", o.object.oid },
+		    { "size", o.object.size},
+		    {   "actions", json_object_t {
+			    {   operation, json_object_t {
+				    { "href", o.actions.href },
+				    { "header", json_object_t {
+					    {"Authorization", o.actions.header.authorization}
+					}
+				    },
+				    { "expires_in", o.actions.expires_in}
+				}
+			    }
+			}
+		    }
+		};
+	    }
         } else {
             jtemp = {
                 { "oid", o.object.oid},
@@ -153,7 +204,7 @@ void lfs::download_handler(const request_t& request, response_t& response, const
     // so we have to do adapt to that situation.
     const std::string oid = get_oid_from_url(request.path);
 
-    std::ifstream file (get_filesystem_path(oid, cfg.file_directory), std::ios::in | std::ios::binary);
+    std::ifstream file (get_filesystem_path(cfg.file_directory, oid), std::ios::in | std::ios::binary);
     std::noskipws(file);
     std::vector<unsigned char> binary_file (std::istream_iterator<char>(file), std::istream_iterator<char>{});
     file.close();
@@ -191,15 +242,16 @@ int lfs::create_directory(const std::string& path)
 }
 
 // Git format.
-std::string lfs::get_filesystem_path(const std::string& oid, const std::string& file_directory)
+std::string lfs::get_filesystem_path(const std::string& file_directory, const std::string& oid)
 {
     const auto oid_data = split_oid(oid);
     return file_directory + '/' + oid_data.parent_dir + '/' + oid_data.child_dir + '/' + oid_data.oid;
 }
 
-void lfs::upload_handler(const request_t& request, response_t&, const server_config::data& cfg)
+void lfs::upload_handler(const request_t& request, response_t& response, const server_config::data& cfg)
 {
     save_file_in_directory(get_oid_from_url(request.target), request.body, cfg);
+    response.status = static_cast<int>(http_response_codes::ok);
 }
 
 std::string lfs::get_oid_from_url(const std::string& url)
@@ -296,4 +348,9 @@ lfs::user_data lfs::parse_b64_auth(const std::string& auth, const std::string& p
 bool lfs::authenticate(const lfs::user_data& credentials, const server_config::data& cfg)
 {
     return credentials.user == cfg.user && credentials.passwd == cfg.passwd;
+}
+
+std::string lfs::get_href(const std::string& protocol, const std::string& host)
+{
+    return protocol + "://" + host;
 }

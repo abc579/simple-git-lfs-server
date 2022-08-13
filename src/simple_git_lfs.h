@@ -23,17 +23,35 @@ namespace lfs {
 	not_found = 404
     };
 
-    // "download": {
+    struct header_object {
+	std::string authorization;
+    };
+
+    struct verify_object {
+	header_object header;
+	std::string href;
+	const std::string expires_in {"86400"};
+    };
+
+    // {
     //       "href": "https://some-download.com",
+    //       "expires_in": 10,
     //       "header": {
-    //         "Key": "value"
+    //         "Authorization": "Basic ..."
     //       },
-    //       "expires_at": "2016-11-10T15:29:07Z",
-    //       "expires_in": 10
+    //       "verify": {
+    //         "href": "https://some-verify-callback.com",
+    //         "header": {
+    //           "Authorization": "Basic ..."
+    //         },
+    //         "expires_in": 86400
+    //       }
     // }
     struct operation_object {
+	verify_object verify;
+	header_object header;
 	std::string href;
-	const std::string expires_in {"3600"};
+	const std::string expires_in {"86400"};
     };
 
     // "error": {
@@ -73,9 +91,9 @@ namespace lfs {
     };
 
     struct batch_client_post_request {
-	std::string operation;
-	std::vector<std::string> transfers;
 	std::vector<batch_object> objects;
+	std::vector<std::string> transfers;
+	std::string operation;
     };
 
     // {
@@ -84,14 +102,9 @@ namespace lfs {
     //     {
     //       "oid": "1111111",
     //       "size": 123,
-    //       "authenticated": true,
     //       "actions": {
     //         "download": {
     //           "href": "https://some-download.com",
-    //           "header": {
-    //             "Key": "value"
-    //           },
-    //           "expires_at": "2016-11-10T15:29:07Z",
     //           "expires_in" 3600,
     //         }
     //       }
@@ -100,8 +113,8 @@ namespace lfs {
     //   "hash_algo": "sha256"
     // }
     struct batch_response {
-	const std::string transfer {"basic"};
 	std::vector<batch_response_object> objects;
+	const std::string transfer {"basic"};
     };
 
     using request_t = httplib::Request;
@@ -120,10 +133,11 @@ namespace lfs {
     bool auth_ok(const request_t&, const server_config::data&);
 
     // Utility functions.
-    void process_batch_request(const json&, response_t&, const server_config::data&);
-    batch_response create_batch_response(const std::string&, const json_array_t&, const server_config::data&);
+    void process_batch_request(const json&, response_t&, const server_config::data&, const std::string&);
+    batch_response create_batch_response(const std::string&, const json_array_t&,
+					 const server_config::data&, const std::string&);
     std::string encode_batch_response(const batch_response&, const std::string&);
-
+    std::string get_href(const std::string&, const std::string&);
     bool can_open(const std::string&);
     size_t get_file_size(const std::string&);
     int create_directory(const std::string&);

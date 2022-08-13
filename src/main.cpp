@@ -61,7 +61,7 @@ int main()
 
 	server.listen(cfg.host, cfg.port);
     } catch (const server_config::config_error& e) {
-	std::cerr << e.what() << std::endl;
+	std::cerr << "Error in server configuration: " << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
 

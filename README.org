@@ -23,13 +23,13 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] The reason why it might not work is because we uploaded the file with Go.
 + [X] Implement upload operation.
 + [X] Reduce compilation time. Improve GNUMake file.
++ [] Support verification request.
++ [] Implement range http request for download operations.
 + [] Convert http to https server.
 + [X] Setup authentication.
-+ [] Implement range http request for download operations.
 + [X] Split headers and .cpp files.
-+ [] There are some things hard to refactor, for instance, some JSON stuff like creating an object which is actually a typedef; the http server, et cetera. I am going to leave this for the end.
++ [] Refactor.
 + [X] Test for errors.
-+ [] Support verification request.
 + [] Support all error codes.
 + [] Change b64 algorithm.
 

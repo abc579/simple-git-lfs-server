@@ -22,6 +22,8 @@ namespace server_config {
 	std::string file_directory {""};
 	const std::string upload_object_path {"/objects/"};
 	const std::string download_object_path {"/objects/"};
+	const std::string verify_object_path {"/verify/"};
+	std::string scheme {""};
     };
 
     data init();
