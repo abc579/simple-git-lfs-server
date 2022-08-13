@@ -2,7 +2,7 @@
 
 I am using a code snippet to decode a string in base64 format.
 
-Source: StackOverFlow... FIXME.
+Source: https://github.com/ReneNyffenegger/cpp-base64
 
 * Http Server Library
 

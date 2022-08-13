@@ -5,6 +5,8 @@
 #include <iostream>
 #include <exception>
 
+#include "util.h"
+
 server_config::data server_config::init()
 {
     data c;
@@ -66,7 +68,7 @@ server_config::data server_config::init()
     c.file_directory = file_directory;
     c.scheme = scheme;
 
-    lfs::create_directory(file_directory);
+    utils::create_directory(file_directory);
 
     return c;
 }

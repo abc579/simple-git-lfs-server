@@ -8,11 +8,11 @@
 #include "logger.h"
 #include "server_config.h"
 
-namespace lfs {
+#define CONTENT_TYPE_LFS "application/vnd.git-lfs+json"
+#define HASH_ALGO "sha256"
+#define ACCEPT_LFS "application/vnd.git-lfs"
 
-    const std::string content_type_lfs {"application/vnd.git-lfs+json"};
-    const std::string hash_algo {"sha256"};
-    const std::string accept_lfs {"application/vnd.git-lfs"};
+namespace lfs {
 
     enum class http_response_codes {
 	ok = 200,
@@ -34,22 +34,7 @@ namespace lfs {
 	const int expires_in {86400};
     };
 
-    // {
-    //       "href": "https://some-download.com",
-    //       "expires_in": 10,
-    //       "header": {
-    //         "Authorization": "Basic ..."
-    //       },
-    //       "verify": {
-    //         "href": "https://some-verify-callback.com",
-    //         "header": {
-    //           "Authorization": "Basic ..."
-    //         },
-    //         "expires_in": 86400
-    //       }
-    // }
     struct operation_object {
-	verify_object verify;
 	header_object header;
 	std::string href;
 	const int expires_in {86400};
@@ -88,6 +73,7 @@ namespace lfs {
     struct batch_response_object {
 	batch_object object;
 	operation_object actions;
+	verify_object verify;
 	error_object error;
 	const bool authenticated {true};
     };
@@ -127,7 +113,7 @@ namespace lfs {
     using json_array_t  = json11::Json::array;
 
     // Handlers.
-    void batch_request_handler(const request_t&, response_t&, const server_config::data&);
+    void batch_request_handler(const request_t&, response_t&, const server_config::data&, lfs::log&);
     void download_handler(const request_t&, response_t&, const server_config::data&);
     void upload_handler(const request_t&, response_t&, const server_config::data&, lfs::log&);
     void verify_handler(const request_t&, response_t&, const server_config::data&);
@@ -135,21 +121,18 @@ namespace lfs {
     // Auth.
     bool auth_ok(const request_t&, const server_config::data&);
 
-    // Utility functions.
-    void process_batch_request(const json&, response_t&, const server_config::data&, const std::string&);
+    void process_batch_request(const json&, response_t&, const server_config::data&, const std::string&,
+			       lfs::log&);
     batch_response create_batch_response(const std::string&, const json_array_t&,
-					 const server_config::data&, const std::string&);
+					 const server_config::data&, const std::string&,
+					 lfs::log&);
     std::string encode_batch_response(const batch_response&, const std::string&);
     std::string get_href(const std::string&, const std::string&);
-    bool can_open(const std::string&);
-    size_t get_file_size(const std::string&);
-    int create_directory(const std::string&);
     std::string get_filesystem_path(const std::string&, const std::string&);
     std::string get_oid_from_url(const std::string&);
     void save_file_in_directory(const std::string&, const std::string&, const server_config::data&,
-				lfs::log& logger);
+				lfs::log&);
     oid_directory split_oid(const std::string&);
-    bool directory_exists(const std::string&);
     user_data parse_b64_auth(const std::string&, const std::string&);
     bool authenticate(const user_data&, const server_config::data&);
 }

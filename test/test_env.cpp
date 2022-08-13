@@ -3,7 +3,7 @@
 #include <cassert>
 #include <unordered_map>
 
-#include "server_config.h"
+#include "../src/server_config.h"
 
 #define LFS_HOST "LFS_HOST"
 #define LFS_ADMINUSER "LFS_ADMINUSER"

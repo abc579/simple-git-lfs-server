@@ -28,12 +28,14 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] Split headers and .cpp files.
 + [X] Test for errors.
 + [X] Fix upload bug.
-+ [] Implement range http request for download operations.
++ [] Check if the verify thingy is firing.
 + [] Test with big file sizes.
++ [] Implement range http request for download operations.
 + [] Convert http to https server.
++ [] Clean TODOs and FIXMEs.
 + [] Refactor.
 + [] Support all error codes.
-+ [] Change b64 algorithm.
++ [X] Change b64 algorithm.
 
 * Questions.
 
@@ -49,10 +51,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 
 - Ref property.
 - Other transfer options that are not "basic".
-- Hash algo that is not sha256.
-- Authenticated property.
 - Expires at property.
-- LFS-Authenticate header in 401 responses.
 
 * Validation codes covered
 
@@ -61,6 +60,6 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 ** TODO 410 - The object was removed by the owner.
 ** TODO 422 - Validation error.
 ** DONE 401 - The authentication credentials are needed, but were not sent. Git LFS will attempt to get the authentication for the request and retry immediately.
-** TODO 403 - The user has read, but not write access. Only applicable when the operation in the request is "upload."
-** TODO 404 - The Repository does not exist for the user.
-** TODO 422 - Validation error with one or more of the objects in the request. This means that none of the requested objects to upload are valid.
+** 403 - The user has read, but not write access. Only applicable when the operation in the request is "upload."
+** 404 - The Repository does not exist for the user.
+** 422 - Validation error with one or more of the objects in the request. This means that none of the requested objects to upload are valid.
