@@ -34,6 +34,8 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [] Refactor: orientate stuff towards one paradigm but do not mix them.
 + [] Support all error codes.
 + [X] Change b64 algorithm.
++ [] Add pthread to makefiles.
++ [] Refactor makefiles.
 
 * Questions.
 
@@ -62,3 +64,11 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 ** 403 - The user has read, but not write access. Only applicable when the operation in the request is "upload."
 ** 404 - The Repository does not exist for the user.
 ** 422 - Validation error with one or more of the objects in the request. This means that none of the requested objects to upload are valid.
+
+* Dependencies.
+
+- g++ compiler.
+- C++14.
+- GNU make.
+- pthread, ssl and crypto libs.
+- openssl cert and private key before running the server.
