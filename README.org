@@ -28,7 +28,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] Check if the verify thingy is firing.
 + [X] Test with big file sizes.
 + [X] Test to kill the process while downloading.
-+ [] Convert http to https server.
++ [X] Convert http to https server.
 + [] Implement range http request for download operations.
 + [] Clean TODOs and FIXMEs.
 + [] Refactor: orientate stuff towards one paradigm but do not mix them.
