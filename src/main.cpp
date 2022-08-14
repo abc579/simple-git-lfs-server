@@ -1,8 +1,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "server_config.h"
 #include "httplib.h"
+
+#include "server_config.h"
 #include "simple_git_lfs.h"
 #include "logger.h"
 
@@ -12,7 +13,7 @@ int main()
 {
     using httplib::Request;
     using httplib::Response;
-    using httplib::Server;
+    using httplib::SSLServer;
 
     try {
 	const server_config::data cfg {server_config::init()};
@@ -24,7 +25,7 @@ int main()
 	// C++ streams.
 	std::ios::sync_with_stdio(false);
 
-	Server server;
+	SSLServer server (cfg.cert.c_str(), cfg.key.c_str());
 
 	// @NOTE(lev): the API does not specify what to do if something like parsing
 	// a JSON goes bad. I have tried the reference Go server and they just return

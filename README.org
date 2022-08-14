@@ -4,16 +4,13 @@ This is a very simple and example server that implements part of the Git LFS API
 
 Since this is a test and I am very unexperienced, it supports the basic things to download and upload lfs objects with SSH authentication.
 
-* TODO
+* DONE
 
 + [X] Create HTTP server that supports POST requests. Library.
 + [X] Handle HTTP POST request and call a given function, i.e. batch_handler().
 + [X] Unpack the contents of the HTTP POST request in batch_handler().
 + [X] Define my own JSON class as an interface to the library.
 + [X] Create the entity batch_response, this will store the actual response to the API call (/batch/objects).
-
-* Milestones.
-
 + [X] Create an HTTP server and handle the batch API request on /objects/batch. Respond always with a 200 code status but with a JSON saying that the object was not found.
 + [X] Decode the request onto a JSON.
 + [X] Decode that JSON into an object.
@@ -28,12 +25,13 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 + [X] Split headers and .cpp files.
 + [X] Test for errors.
 + [X] Fix upload bug.
-+ [] Check if the verify thingy is firing.
-+ [] Test with big file sizes.
-+ [] Implement range http request for download operations.
++ [X] Check if the verify thingy is firing.
++ [X] Test with big file sizes.
++ [X] Test to kill the process while downloading.
 + [] Convert http to https server.
++ [] Implement range http request for download operations.
 + [] Clean TODOs and FIXMEs.
-+ [] Refactor.
++ [] Refactor: orientate stuff towards one paradigm but do not mix them.
 + [] Support all error codes.
 + [X] Change b64 algorithm.
 
@@ -46,6 +44,7 @@ Since this is a test and I am very unexperienced, it supports the basic things t
 - [] How do people structure source code and header files? Project scaffolding.
 - [] How can we speed compilation times?
 - [] Why does the API not require auth for the verify callback? Furthermore, the reference Go server crashes if the object does not exist... In our case, the auth is necessary for verify too.
+- [] When I am downloading a repo with very large files, if I kill the process in between, the server seems to keep using a lot of CPU, but I am kinda lost on how to avoid that.
 
 * Not supported.
 

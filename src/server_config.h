@@ -24,6 +24,8 @@ namespace server_config {
 	const std::string download_object_path {"/objects/"};
 	const std::string verify_object_path {"/verify"};
 	std::string scheme {""};
+	std::string cert {""};
+	std::string key {""};
     };
 
     data init();
