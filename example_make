@@ -1,0 +1,17 @@
+CXX = g++
+CXXFLAGS = -O2
+
+main : main.cpp
+        $(CXX) $(CXXFLAGS) main.o header1.o header2.o -o main
+
+main.cpp : header1.o header2.o
+        $(CXX) $(CXXFLAGS) -c main.cpp -o main.o
+
+header1.o :
+        $(CXX) $(CXXFLAGS) -c header1.cpp -o header1.o
+
+header2.o :
+        $(CXX) $(CXXFLAGS) -c header2.cpp -o header2.o
+
+clean :
+        rm *.o
