@@ -130,7 +130,8 @@ namespace lfs {
                                        const server_config::data&, const std::string&,
                                        lfs::log&);
   std::string encode_batch_response(const batch_response&, const std::string&);
-  std::string get_href(const std::string&, const std::string&);
+  std::string get_href(const std::string&, const std::string&, const std::string&,
+                       const std::string&, const std::string& = "");
   std::string get_filesystem_path(const std::string&, const std::string&);
   std::string get_oid_from_url(const std::string&);
   void save_file_in_directory(const std::string&, const std::string&, const server_config::data&,

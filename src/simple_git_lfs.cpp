@@ -93,7 +93,7 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation, con
 
 	    operation_object actions = {
         {authorization}, // Header.
-        get_href(cfg.scheme, cfg.host + ':' + std::to_string(cfg.port) + cfg.download_object_path + bo.oid), // Href of operation.
+        get_href(cfg.scheme, cfg.host, std::to_string(cfg.port), cfg.download_object_path, bo.oid),
 	    };
 
 	    br.objects.push_back({bo, actions, {}, {}});
@@ -105,12 +105,12 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation, con
 
 	    operation_object actions = {
         {authorization}, // Header.
-        get_href(cfg.scheme, cfg.host + ':' + std::to_string(cfg.port) + cfg.upload_object_path + bo.oid), // Href of operation.
+        get_href(cfg.scheme, cfg.host, std::to_string(cfg.port), cfg.upload_object_path, bo.oid),
 	    };
 
 	    verify_object verify = {
         {authorization},
-        get_href(cfg.scheme, cfg.host + ':' + std::to_string(cfg.port) + cfg.verify_object_path), // Href of verify.
+        get_href(cfg.scheme, cfg.host, std::to_string(cfg.port), cfg.verify_object_path),
 	    };
 
 	    br.objects.push_back({bo, actions, verify, {}});
@@ -348,7 +348,12 @@ lfs::user_data lfs::parse_b64_auth(const std::string& auth, const std::string& p
   return {decoded_auth.substr(0, colon_pos), decoded_auth.substr(colon_pos + 1)};
 }
 
-std::string lfs::get_href(const std::string& protocol, const std::string& host)
+std::string lfs::get_href(const std::string& protocol, const std::string& host, const std::string& port,
+                          const std::string& path, const std::string& oid)
 {
-  return protocol + "://" + host;
+  if (oid.empty()) {
+    return protocol + "://" + host + ':' + port + path;
+  }
+  
+  return protocol + "://" + host + ':' + port + path + oid;
 }
