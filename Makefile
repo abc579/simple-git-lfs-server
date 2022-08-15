@@ -44,9 +44,9 @@ run :
 
 clean :
 	rm -rf $(OUT)
-	rm src/*.o
-	rm inc/*.o
-	rm lfs.log
+	rm -f src/*.o
+	rm -f inc/*.o
+	rm -f lfs.log
 
 # If there is a target called clean/all/run then GNUmake could be confused, so we
 # will avoid that, just in case.

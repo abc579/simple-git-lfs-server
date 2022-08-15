@@ -44,11 +44,11 @@ test_base64.o : ../inc/base64.o
 	$(CXX) $(CXXFLAGS) -c ../src/logger.cpp -o $@
 
 clean :
-	rm *.test
-	rm *.o
-	rm lfs.log
-	rm ../src/*.o
-	rm ../inc/*.o
+	rm -f *.test
+	rm -f *.o
+	rm -f lfs.log
+	rm -f ../src/*.o
+	rm -f ../inc/*.o
 
 run : $(EXECUTABLES)
 	for i in $^; do echo $$i; ./$$i || exit 1; echo; done
