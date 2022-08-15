@@ -1,4 +1,4 @@
-EXECUTABLES = $(wildcard *.test)
+EXECUTABLES	 = $(wildcard *.test)
 CXX = g++
 LDFLAGS = -lpthread
 CXXFLAGS = -std=c++14 -g3 -I../src -I../inc

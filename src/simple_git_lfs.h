@@ -105,9 +105,9 @@ struct batch_response {
   const std::string transfer{"basic"};
 };
 
+// Trying to reduce coupling a little bit.
 using request_t = httplib::Request;
 using response_t = httplib::Response;
-
 using json_t = json11::Json;
 using json_object_t = json11::Json::object;
 using json_array_t = json11::Json::array;
@@ -126,7 +126,8 @@ bool process_auth(const request_t&, response_t&, const server_config::data&);
 bool authenticate(const user_data&, const server_config::data&);
 bool parse_auth(const request_t&, user_data&);
 
-void process_batch_request(const json&, response_t&, const server_config::data&,
+json_t parse_json(const std::string&, std::string&);
+void process_batch_request(const json_t&, response_t&, const server_config::data&,
                            const std::string&, lfs::log&);
 batch_response create_batch_response(const std::string&, const json_array_t&,
                                      const server_config::data&,

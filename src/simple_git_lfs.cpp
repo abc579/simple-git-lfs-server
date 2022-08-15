@@ -18,10 +18,21 @@
 #include "server_config.h"
 #include "util.h"
 
+lfs::json_t lfs::parse_json(const std::string& j, std::string& err)
+{
+  return json11::Json::parse(j, err);
+}
+
 void lfs::batch_request_handler(const request_t& request, response_t& response,
                                 const server_config::data& cfg,
                                 lfs::log& logger) {
-  auto req = json(request.body);
+  std::string err;
+  auto req = lfs::parse_json(request.body, err);
+
+  if (!err.empty()) {
+    throw json_parse_error{"batch_request_handler(): Bad JSON format."};
+  }
+  
   const auto auth = request.headers.find("Authorization")->second;
 
   // Notice that `process_batch_request` throws an exception and we do not catch
@@ -32,11 +43,11 @@ void lfs::batch_request_handler(const request_t& request, response_t& response,
   response.status = static_cast<int>(http_response_codes::ok);
 }
 
-void lfs::process_batch_request(const json& request, response_t& response,
+void lfs::process_batch_request(const json_t& request, response_t& response,
                                 const server_config::data& cfg,
                                 const std::string& authorization,
                                 lfs::log& logger) {
-  const auto objects = request.get_array_items("objects");
+  const auto objects = request["objects"].array_items();
 
   // @NOTE(lev): API is silent about this, but since there is no
   // reasonable thing to do, we will throw an exception.
@@ -44,7 +55,7 @@ void lfs::process_batch_request(const json& request, response_t& response,
     throw json_parse_error{"`objects` key is mandatory."};
   }
 
-  auto temp_op = request.get_string_value("operation");
+  auto temp_op = request["operation"].string_value();
 
   // @NOTE(lev): again, the API does not tell what to do if the request
   // does not specify the operation or the operation is not download or upload.
@@ -213,7 +224,7 @@ void lfs::download_handler(const request_t& request, response_t& response,
   response.set_header("Accept", ACCEPT_LFS);
   response.set_content(std::string(binary_file.begin(), binary_file.end()),
                        "application/octet-stream");
-  response.status = (int)http_response_codes::ok;
+  response.status = static_cast<int>(http_response_codes::ok);
 }
 
 // Git format.
@@ -233,8 +244,14 @@ void lfs::upload_handler(const request_t& request, response_t& response,
 
 void lfs::verify_handler(const request_t& request, response_t& response,
                          const server_config::data& cfg) {
-  const auto object = json(request.body);
-  const auto oid = object.get_string_value("oid");
+  std::string msg;
+  const auto object = lfs::parse_json(request.body, msg);
+
+  if (!msg.empty()) {
+    throw json_parse_error {"verify_handler(): Error parsing JSON."};
+  }
+  
+  const auto oid = object["oid"].string_value();
 
   if (!utils::can_open(get_filesystem_path(cfg.file_directory, oid))) {
     response.status = static_cast<int>(object_error_codes::not_found);

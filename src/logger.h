@@ -8,7 +8,7 @@ namespace lfs {
 struct logger_error : public std::exception {
   std::string msg;
 
-  logger_error(const std::string& e) : msg{e} {
+  explicit logger_error(const std::string& e) : msg{e} {
   }
 
   const char* what() const noexcept {

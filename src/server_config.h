@@ -7,7 +7,7 @@ namespace server_config {
 
 class config_error : public std::exception {
  public:
-  config_error(const std::string& e) : error{e} {
+  explicit config_error(const std::string& e) : error{e} {
   }
 
  public:

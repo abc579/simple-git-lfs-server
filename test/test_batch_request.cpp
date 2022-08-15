@@ -13,6 +13,7 @@
 using request_t = httplib::Request;
 using response_t = httplib::Response;
 using json_t = json11::Json;
+using json_array_t = json11::Json::array;
 
 void test_json_malformed() {
   std::cout << "Testing test_json_malformed()...";
@@ -73,8 +74,9 @@ void test_json_lacks_oid() {
     assert(true);
 
     const auto new_response = response.body;
-    const auto json = lfs::json(new_response);
-    const auto object_array = json.get_array_items("objects");
+    std::string err;
+    const auto json = lfs::parse_json(new_response, err);
+    const auto object_array = json["objects"].array_items();
 
     for (const auto& ob : object_array) {
       assert(ob["oid"].string_value().empty());
@@ -118,8 +120,9 @@ void test_json_lacks_size() {
     assert(true);
 
     const auto new_response = response.body;
-    const auto json = lfs::json(new_response);
-    const auto object_array = json.get_array_items("objects");
+    std::string err;
+    const auto json = lfs::parse_json(new_response, err);
+    const auto object_array = json["objects"].array_items();
 
     for (const auto& ob : object_array) {
       if (ob["size"].int_value() != 1024) {
@@ -169,9 +172,10 @@ void test_json_operation_unknown() {
     assert(true);
 
     const auto new_response = response.body;
-    const auto json = lfs::json(new_response);
-    const auto objects = json.get_array_items("objects");
-    const auto array = json11::Json::array(objects);
+    std::string err;
+    const auto json = lfs::parse_json(new_response, err);
+    const auto objects = json["objects"].array_items();
+    const auto array = json_array_t(objects);
 
     for (const auto& o : objects) {
       const auto actions = o["actions"];
