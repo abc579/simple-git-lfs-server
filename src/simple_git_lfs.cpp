@@ -75,7 +75,6 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation,
 
   batch_response br;
 
-  // @TODO(lev): create function to get href.
   if (operation == "download") {
     for (const auto& o : objects) {
       const auto oid = o["oid"].string_value();
@@ -131,61 +130,70 @@ lfs::batch_response lfs::create_batch_response(const std::string& operation,
 std::string lfs::encode_batch_response(const batch_response& br,
                                        const std::string& operation) {
   json_object_t j = {{"transfer", br.transfer}, {"hash_algo", HASH_ALGO}};
-
   json_array_t object_array;
 
+  if (operation == "upload") {
+    encode_upload_batch_response(br, object_array);
+  } else if (operation == "download") {
+    encode_download_batch_response(br, object_array);
+  }
+
+  j["objects"] = object_array;
+
+  return json_t(j).dump();
+}
+
+void lfs::encode_upload_batch_response(const batch_response& br,
+                                       json_array_t& object_array) {
   for (const auto& o : br.objects) {
     json_object_t jtemp;
+    jtemp = {
+        {"oid", o.object.oid},
+        {"size", o.object.size},
+        {"authenticated", o.authenticated},
+        {"actions",
+         json_object_t{
+             {"upload",
+              json_object_t{
+                  {"href", o.actions.href},
+                  {"header", json_object_t{{"Authorization",
+                                            o.actions.header.authorization}}},
+                  {"expires_in", o.actions.expires_in}}},
+             {"verify",
+              json_object_t{
+                  {"href", o.verify.href},
+                  {"header", json_object_t{{"Authorization",
+                                            o.verify.header.authorization}}},
+                  {"expires_in", o.verify.expires_in}}}}}};
+    object_array.push_back(jtemp);
+  }
+}
 
+void lfs::encode_download_batch_response(const batch_response& br,
+                                         json_array_t& object_array) {
+  for (const auto& o : br.objects) {
+    json_object_t jtemp;
     if (o.error.message.empty()) {
-      // @TEMP(lev): Think about a better way to do this.
-      if (operation == "upload") {
-        jtemp = {{"oid", o.object.oid},
-                 {"size", o.object.size},
-                 {"authenticated", o.authenticated},
-                 {"actions",
-                  json_object_t{
-                      {operation,
-                       json_object_t{
-                           {"href", o.actions.href},
-                           {"header",
-                            json_object_t{{"Authorization",
-                                           o.actions.header.authorization}}},
-                           {"expires_in", o.actions.expires_in}}},
-                      {"verify",
-                       json_object_t{
-                           {"href", o.verify.href},
-                           {"header",
-                            json_object_t{{"Authorization",
-                                           o.verify.header.authorization}}},
-                           {"expires_in", o.verify.expires_in}}}}}};
-      } else {
-        jtemp = {{"oid", o.object.oid},
-                 {"size", o.object.size},
-                 {"authenticated", o.authenticated},
-                 {"actions",
-                  json_object_t{
-                      {operation,
-                       json_object_t{
-                           {"href", o.actions.href},
-                           {"header",
-                            json_object_t{{"Authorization",
-                                           o.actions.header.authorization}}},
-                           {"expires_in", o.actions.expires_in}}}}}};
-      }
+      jtemp = {
+          {"oid", o.object.oid},
+          {"size", o.object.size},
+          {"authenticated", o.authenticated},
+          {"actions",
+           json_object_t{
+               {"download",
+                json_object_t{
+                    {"href", o.actions.href},
+                    {"header", json_object_t{{"Authorization",
+                                              o.actions.header.authorization}}},
+                    {"expires_in", o.actions.expires_in}}}}}};
     } else {
       jtemp = {{"oid", o.object.oid},
                {"size", o.object.size},
                {"error", json_object_t{{"code", o.error.code},
                                        {"message", o.error.message}}}};
     }
-
     object_array.push_back(jtemp);
   }
-
-  j["objects"] = object_array;
-
-  return json_t(j).dump();
 }
 
 // In this case, the OID comes in the URL, so we have to extract that and

@@ -140,4 +140,6 @@ void save_file_in_directory(const std::string&, const std::string&,
                             const server_config::data&, lfs::log&);
 oid_directory split_oid(const std::string&);
 user_data parse_b64_auth(const std::string&, const std::string&);
+void encode_upload_batch_response(const batch_response&, json_array_t&);
+void encode_download_batch_response(const batch_response&, json_array_t&);
 }  // namespace lfs
