@@ -16,31 +16,31 @@ build :
 	mkdir -p $(OUT)
 
 out/lfs_server : $(SRCS_O) $(INCS_O)
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -Iinc $(SRCS_O) $(INCS_O) -o out/lfs_server $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -Iinc $(SRCS_O) $(INCS_O) -o $@ $(LDFLAGS)
 
 src/main.o :
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -Iinc -c src/main.cpp -o src/main.o
+	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -Iinc -c src/main.cpp -o $@
 
 src/server_config.o : src/server_config.cpp
-	$(CXX) $(CXXFLAGS) -Iinc -c src/server_config.cpp -o src/server_config.o
+	$(CXX) $(CXXFLAGS) -Iinc -c $^ -o $@
 
 src/simple_git_lfs.o : src/simple_git_lfs.cpp
-	$(CXX) $(CXXFLAGS) -Iinc -c src/simple_git_lfs.cpp -o src/simple_git_lfs.o
+	$(CXX) $(CXXFLAGS) -Iinc -c $^ -o $@
 
 src/logger.o : src/logger.cpp
-	$(CXX) $(CXXFLAGS) -c src/logger.cpp -o src/logger.o
+	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
 src/util.o : src/util.cpp
-	$(CXX) $(CXXFLAGS) -c src/util.cpp -o src/util.o
+	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
 inc/httplib.o : inc/httplib.cpp
 	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -c inc/httplib.cpp -o inc/httplib.o $(LDFLAGS)
 
 inc/json11.o : inc/json11.cpp
-	$(CXX) $(CXXFLAGS) -c inc/json11.cpp -o inc/json11.o
+	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
 inc/base64.o : inc/base64.cpp
-	$(CXX) $(CXXFLAGS) -c inc/base64.cpp -o inc/base64.o
+	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
 run :
 	./$(OUT)$(MAINT)

@@ -36,8 +36,9 @@ This is a very naïve implementation of part of the Git LFS API.
 + [X] How do we calculate expires_in?
 + [X] Fix convoluted json construction.
 + [X] Run static analyzers.
-+ [] Rename certain objects.
 + [X] Encapsulate JSON.
++ [] Rename certain objects.
++ [] Reorganize some stuff, create a folder with file utils or something like that.
   
 * Questions.
 

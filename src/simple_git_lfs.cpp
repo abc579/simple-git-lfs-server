@@ -18,6 +18,16 @@
 #include "server_config.h"
 #include "util.h"
 
+void lfs::handle_exceptions(const request_t&, response_t& response, std::exception_ptr)
+{
+  // @NOTE(lev): the API does not specify what to do if something like parsing
+  // a JSON goes bad. I have tried the reference Go server and they just
+  // return the following: { "objects" : "null }. We will do the same thing
+  // for now.
+  response.status = static_cast<int>(lfs::http_response_codes::ok);
+  response.set_content(R"({"objects":null})", CONTENT_TYPE_LFS);
+}
+
 lfs::json_t lfs::parse_json(const std::string& j, std::string& err)
 {
   return json11::Json::parse(j, err);
@@ -35,9 +45,6 @@ void lfs::batch_request_handler(const request_t& request, response_t& response,
   
   const auto auth = request.headers.find("Authorization")->second;
 
-  // Notice that `process_batch_request` throws an exception and we do not catch
-  // it here; this is intented: when we throw an exception the lambda defined in
-  // `main` by calling `set_exception_handler` will actually do the job.
   process_batch_request(req, response, cfg, auth, logger);
 
   response.status = static_cast<int>(http_response_codes::ok);

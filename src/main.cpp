@@ -23,14 +23,7 @@ int main() {
 
     SSLServer server(cfg.cert.c_str(), cfg.key.c_str());
 
-    // @NOTE(lev): the API does not specify what to do if something like parsing
-    // a JSON goes bad. I have tried the reference Go server and they just
-    // return the following: { "objects" : "null }. We will do the same thing
-    // for now.
-    server.set_exception_handler([](const auto&, auto& response, auto) {
-      response.status = static_cast<int>(lfs::http_response_codes::ok);
-      response.set_content(R"({"objects":null})", CONTENT_TYPE_LFS);
-    });
+    server.set_exception_handler(lfs::handle_exceptions);
 
     server.Post("/objects/batch",
                 [&cfg, &logger](const auto& request, auto& response) {

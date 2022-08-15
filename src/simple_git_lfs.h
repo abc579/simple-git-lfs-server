@@ -18,8 +18,7 @@ namespace lfs {
 
 enum class http_response_codes {
   ok = 200,
-  auth_required_but_not_given = 401,
-  validation_error = 422
+  auth_required_but_not_given = 401
 };
 
 enum class object_error_codes { not_found = 404 };
@@ -113,6 +112,7 @@ using json_object_t = json11::Json::object;
 using json_array_t = json11::Json::array;
 
 // Handlers.
+void handle_exceptions(const request_t&, response_t&, std::exception_ptr);
 void batch_request_handler(const request_t&, response_t&,
                            const server_config::data&, lfs::log&);
 void download_handler(const request_t&, response_t&,
