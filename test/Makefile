@@ -3,14 +3,14 @@ CXX = g++
 LDFLAGS = -lpthread
 CXXFLAGS = -std=c++14 -g3 -I../src -I../inc
 
-all : test_env.cpp test_auth.o test_batch_request.o test_base64.o
+all : test_env.o test_auth.o test_batch_request.o test_base64.o
 	$(CXX) $(CXXFLAGS) test_env.o ../src/server_config.o ../src/util.o ../src/simple_git_lfs.o ../inc/base64.o ../inc/httplib.o ../inc/json11.o ../src/logger.o -o test_env.test
 	$(CXX) $(CXXFLAGS) test_env.cpp ../src/server_config.o ../src/util.o ../src/logger.o -o test_env.test
 	$(CXX) $(CXXFLAGS) test_auth.cpp ../src/server_config.o ../src/simple_git_lfs.o ../inc/base64.o ../inc/httplib.o ../inc/json11.o ../src/util.o ../src/logger.o -o test_auth.test
 	$(CXX) $(CXXFLAGS) test_batch_request.o ../src/server_config.o ../src/simple_git_lfs.o ../inc/base64.o ../inc/httplib.o ../inc/json11.o ../src/util.o ../src/logger.o -o test_batch_request.test
 	$(CXX) $(CXXFLAGS) test_base64.o ../inc/base64.o -o test_base64.test
 
-test_env.cpp : ../src/server_config.o ../src/util.o ../src/simple_git_lfs.o
+test_env.o : ../src/server_config.o ../src/util.o ../src/simple_git_lfs.o
 	$(CXX) $(CXXFLAGS) -c test_env.cpp -o test_env.o
 
 test_auth.o : ../src/server_config.o ../src/simple_git_lfs.o ../inc/httplib.o
@@ -22,25 +22,25 @@ test_batch_request.o : ../src/server_config.o ../src/simple_git_lfs.o ../inc/htt
 test_base64.o : ../inc/base64.o
 	$(CXX) $(CXXFLAGS) -c test_base64.cpp -o test_base64.o
 
-../src/server_config.o :
+../src/server_config.o : ../src/server_config.cpp
 	$(CXX) $(CXXFLAGS) -c ../src/server_config.cpp -o $@
 
-../src/util.o :
+../src/util.o : ../src/util.cpp
 	$(CXX) $(CXXFLAGS) -c ../src/util.cpp -o $@
 
-../src/simple_git_lfs.o : ../inc/json11.o ../inc/httplib.o ../inc/base64.o ../src/logger.o
+../src/simple_git_lfs.o : ../inc/json11.o ../inc/httplib.o ../inc/base64.o ../src/logger.o ../src/simple_git_lfs.cpp
 	$(CXX) $(CXXFLAGS) -c ../src/simple_git_lfs.cpp -o $@
 
-../inc/json11.o :
+../inc/json11.o : ../inc/json11.cpp
 	$(CXX) $(CXXFLAGS) -c ../inc/json11.cpp -o $@
 
-../inc/httplib.o :
+../inc/httplib.o : ../inc/httplib.cpp
 	$(CXX) $(CXXFLAGS) -c ../inc/httplib.cpp -o $@
 
-../inc/base64.o :
+../inc/base64.o : ../inc/base64.cpp
 	$(CXX) $(CXXFLAGS) -c ../inc/base64.cpp -o $@
 
-../src/logger.o :
+../src/logger.o : ../src/logger.cpp
 	$(CXX) $(CXXFLAGS) -c ../src/logger.cpp -o $@
 
 clean :
