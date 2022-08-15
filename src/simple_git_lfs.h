@@ -11,6 +11,7 @@
 #define CONTENT_TYPE_LFS "application/vnd.git-lfs+json"
 #define HASH_ALGO "sha256"
 #define ACCEPT_LFS "application/vnd.git-lfs"
+#define AUTH_ERROR R"({ "message": "Credentials needed", "documentation_url": "https://lfs-server.com/docs/errors"})"
 
 namespace lfs {
 
@@ -119,7 +120,9 @@ namespace lfs {
   void verify_handler(const request_t&, response_t&, const server_config::data&);
 
   // Auth.
-  bool auth_ok(const request_t&, const server_config::data&);
+  bool process_auth(const request_t&, response_t&, const server_config::data&);
+  bool authenticate(const user_data&, const server_config::data&);
+  bool parse_auth(const request_t&, user_data&);
 
   void process_batch_request(const json&, response_t&, const server_config::data&, const std::string&,
                              lfs::log&);
@@ -134,5 +137,4 @@ namespace lfs {
                               lfs::log&);
   oid_directory split_oid(const std::string&);
   user_data parse_b64_auth(const std::string&, const std::string&);
-  bool authenticate(const user_data&, const server_config::data&);
 }

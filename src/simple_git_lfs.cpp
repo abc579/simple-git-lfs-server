@@ -290,9 +290,20 @@ void lfs::save_file_in_directory(const std::string& oid, const std::string& raw,
   file.write(reinterpret_cast<char *>(&raw_vec.front()), sizeof(unsigned char) * raw_vec.size());
 }
 
-// Right now we only suport Basic auth.
-// See RFC 2617, Section 2.
-bool lfs::auth_ok(const request_t& request, const server_config::data& cfg)
+bool lfs::process_auth(const request_t& request, response_t& response, const server_config::data& cfg)
+{
+  user_data credentials;
+  
+  if (!parse_auth(request, credentials) || !authenticate(credentials, cfg)) {
+    response.status = static_cast<int>(http_response_codes::auth_required_but_not_given);
+    response.set_content(AUTH_ERROR, CONTENT_TYPE_LFS);
+    return false;
+  }
+
+  return true;
+}
+
+bool lfs::parse_auth(const request_t& request, user_data& credentials)
 {
   const auto auth = request.get_header_value("Authorization");
   const std::string prefix {"Basic "};
@@ -305,13 +316,20 @@ bool lfs::auth_ok(const request_t& request, const server_config::data& cfg)
     return false;
   }
 
-  const auto credentials = parse_b64_auth(auth, prefix);
+  credentials = parse_b64_auth(auth, prefix);
 
   if (credentials.user.empty()) {
     return false;
   }
 
-  return authenticate(credentials, cfg);
+  return true;
+}
+
+// Right now we only suport Basic auth.
+// See RFC 2617, Section 2.
+bool lfs::authenticate(const user_data& credentials, const server_config::data& cfg)
+{
+  return credentials.user == cfg.user && credentials.passwd == cfg.passwd;
 }
 
 // AUTH will be something like this: "Basic dGVtcDp0ZW1w"
@@ -328,11 +346,6 @@ lfs::user_data lfs::parse_b64_auth(const std::string& auth, const std::string& p
   const auto colon_pos = decoded_auth.find(':');
 
   return {decoded_auth.substr(0, colon_pos), decoded_auth.substr(colon_pos + 1)};
-}
-
-bool lfs::authenticate(const lfs::user_data& credentials, const server_config::data& cfg)
-{
-  return credentials.user == cfg.user && credentials.passwd == cfg.passwd;
 }
 
 std::string lfs::get_href(const std::string& protocol, const std::string& host)

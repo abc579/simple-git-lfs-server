@@ -38,6 +38,8 @@ things to download and upload lfs objects with SSH authentication.
 + [] Support all error codes.
 + [X] Change b64 algorithm.
 + [X] Add pthread to makefiles.
++ [] How do we calculate expires_in?
++ [] Rename certain objects.
 
 * Questions.
 
