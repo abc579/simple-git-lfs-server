@@ -1,21 +1,20 @@
+#include <cassert>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <string>
-#include <cassert>
-#include <fstream>
 
 #include "../inc/httplib.h"
+#include "../src/json.h"
 #include "../src/server_config.h"
 #include "../src/simple_git_lfs.h"
-#include "../src/json.h"
 #include "json11.hpp"
 
 using request_t = httplib::Request;
 using response_t = httplib::Response;
 using json_t = json11::Json;
 
-void test_json_malformed()
-{
+void test_json_malformed() {
   std::cout << "Testing test_json_malformed()...";
 
   const auto malformed = R"({
@@ -49,8 +48,7 @@ void test_json_malformed()
   std::cout << "ok" << std::endl;
 }
 
-void test_json_lacks_oid()
-{
+void test_json_lacks_oid() {
   std::cout << "Testing test_json_lacks_oid...";
 
   const auto j = R"({
@@ -79,7 +77,7 @@ void test_json_lacks_oid()
     const auto object_array = json.get_array_items("objects");
 
     for (const auto& ob : object_array) {
-	    assert(ob["oid"].string_value().empty());
+      assert(ob["oid"].string_value().empty());
     }
 
   } catch (const lfs::json_parse_error&) {
@@ -87,11 +85,9 @@ void test_json_lacks_oid()
   }
 
   std::cout << "ok" << std::endl;
-
 }
 
-void test_json_lacks_size()
-{
+void test_json_lacks_size() {
   std::cout << "Testing test_json_lacks_size()...";
 
   const auto j = R"({
@@ -103,10 +99,12 @@ void test_json_lacks_size()
      }
      ]})";
 
-  server_config::data cfg {"temp", "temp", "temp", 8080, "temp"};
+  server_config::data cfg{"temp", "temp", "temp", 8080, "temp"};
 
   std::system("mkdir -p temp/5f/70/");
-  std::system("fallocate -l 1KiB temp/5f/70/bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef");
+  std::system("fallocate -l 1KiB "
+              "temp/5f/70/"
+              "bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef");
 
   response_t response;
   request_t request;
@@ -124,10 +122,10 @@ void test_json_lacks_size()
     const auto object_array = json.get_array_items("objects");
 
     for (const auto& ob : object_array) {
-	    if (ob["size"].int_value() != 1024) {
+      if (ob["size"].int_value() != 1024) {
         std::system("rm -rf temp");
         assert(false);
-	    }
+      }
     }
 
   } catch (const lfs::json_parse_error&) {
@@ -139,8 +137,7 @@ void test_json_lacks_size()
   std::cout << "ok" << std::endl;
 }
 
-void test_json_operation_unknown()
-{
+void test_json_operation_unknown() {
   std::cout << "Testing test_json_operation_unknown()...";
 
   const auto j = R"({
@@ -153,10 +150,12 @@ void test_json_operation_unknown()
      }
      ]})";
 
-  server_config::data cfg {"temp", "temp", "temp", 8080, "temp"};
+  server_config::data cfg{"temp", "temp", "temp", 8080, "temp"};
 
   std::system("mkdir -p temp/5f/70/");
-  std::system("fallocate -l 1KiB temp/5f/70/bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef");
+  std::system("fallocate -l 1KiB "
+              "temp/5f/70/"
+              "bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef");
 
   response_t response;
   request_t request;
@@ -175,8 +174,8 @@ void test_json_operation_unknown()
     const auto array = json11::Json::array(objects);
 
     for (const auto& o : objects) {
-	    const auto actions = o["actions"];
-	    assert(!actions["download"].dump().empty());
+      const auto actions = o["actions"];
+      assert(!actions["download"].dump().empty());
     }
 
   } catch (const lfs::json_parse_error&) {
@@ -188,8 +187,7 @@ void test_json_operation_unknown()
   std::cout << "ok" << std::endl;
 }
 
-int main()
-{
+int main() {
   test_json_malformed();
   test_json_lacks_oid();
   test_json_lacks_size();

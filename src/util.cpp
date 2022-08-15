@@ -1,19 +1,19 @@
-#include <fstream>
-#include <sstream>
+#include "util.h"
+
 #include <sys/stat.h>
 
-#include "util.h"
+#include <fstream>
+#include <sstream>
+
 #include "logger.h"
 
-bool utils::can_open(const std::string& path)
-{
-  std::ifstream ifs (path, std::ios::in | std::ios::binary);
+bool utils::can_open(const std::string& path) {
+  std::ifstream ifs(path, std::ios::in | std::ios::binary);
 
   return ifs.is_open();
 }
 
-size_t utils::get_file_size(const std::string& path, lfs::log& logger)
-{
+size_t utils::get_file_size(const std::string& path, lfs::log& logger) {
   if (!can_open(path)) {
     std::stringstream ss;
     ss << "get_file_size(): Could not open file " << path;
@@ -22,7 +22,7 @@ size_t utils::get_file_size(const std::string& path, lfs::log& logger)
     return 0;
   }
 
-  std::ifstream file (path, std::ios::in | std::ios::binary);
+  std::ifstream file(path, std::ios::in | std::ios::binary);
   file.unsetf(std::ios::skipws);
   file.seekg(0, std::ios::end);
   auto file_size = file.tellg();
@@ -30,13 +30,11 @@ size_t utils::get_file_size(const std::string& path, lfs::log& logger)
   return file_size;
 }
 
-int utils::create_directory(const std::string& path)
-{
+int utils::create_directory(const std::string& path) {
   return mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
 
-bool utils::directory_exists(const std::string& path)
-{
+bool utils::directory_exists(const std::string& path) {
   struct stat s;
 
   stat(path.c_str(), &s);
