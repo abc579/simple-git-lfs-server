@@ -1,10 +1,6 @@
 * simple-git-lfs-server
 
-This is a very simple and example server that implements part of the Git
-LFS API.
-
-Since this is a test and I am very unexperienced, it supports the basic
-things to download and upload lfs objects with SSH authentication.
+This is a very naïve implementation of part of the Git LFS API.
 
 * DONE
 
@@ -32,14 +28,14 @@ things to download and upload lfs objects with SSH authentication.
 + [X] Test to kill the process while downloading.
 + [X] Convert http to https server.
 + [X] Refactor Makefile.
-+ [] Clean TODOs and FIXMEs.
-+ [] Refactor: orientate stuff towards one paradigm but do not mix them.
-+ [] Implement range http request for download operations.
-+ [] Support all error codes.
++ [X] Clean TODOs and FIXMEs.
++ [X] Refactor: orientate stuff towards one paradigm but do not mix them.
 + [X] Change b64 algorithm.
 + [X] Add pthread to makefiles.
-+ [] How do we calculate expires_in?
++ [X] Support all error codes?...
++ [X] How do we calculate expires_in?
 + [] Rename certain objects.
++ [] Implement range http request for download operations.
 
 * Questions.
 
@@ -62,6 +58,8 @@ things to download and upload lfs objects with SSH authentication.
 - [] When I am downloading a repo with very large files, if I kill the
   process in between, the server seems to keep using a lot of CPU, but I
   am kinda lost on how to avoid that.
+- [] How come I do not have to do anything for authentication? (besides
+  checking "Authorization" header)
 
 * Not supported.
 
@@ -69,21 +67,10 @@ things to download and upload lfs objects with SSH authentication.
 - Other transfer options that are not "basic".
 - Expires at property.
 
-* Validation codes covered
-
-** DONE 404 - The object does not exist on the server.
-** TODO 409 - The specified hash algorithm disagrees with the server's acceptable options.
-** TODO 410 - The object was removed by the owner.
-** TODO 422 - Validation error.
-** DONE 401 - The authentication credentials are needed, but were not sent. Git LFS will attempt to get the authentication for the request and retry immediately.
-** 403 - The user has read, but not write access. Only applicable when the operation in the request is "upload."
-** 404 - The Repository does not exist for the user.
-** 422 - Validation error with one or more of the objects in the request. This means that none of the requested objects to upload are valid.
-
 * Dependencies.
 
 - g++ compiler.
 - C++14.
 - GNU make.
-- pthread, ssl and crypto libs.
+- libpthread, libssl and libcrypto.
 - openssl cert and private key before running the server.

@@ -133,9 +133,7 @@ std::string lfs::encode_batch_response(const batch_response& br, const std::stri
     json_object_t jtemp;
 
     if (o.error.message.empty()) {
-	    // @FIXME(lev): come with something better. The thing is that we have
-	    // to provide a "verify" field for uploads, not in downloads. The
-	    // rest is the same.
+	    // @TEMP(lev): Think about a better way to do this.
 	    if (operation == "upload") {
         jtemp = {
           { "oid", o.object.oid },
@@ -207,8 +205,6 @@ std::string lfs::encode_batch_response(const batch_response& br, const std::stri
 // in a string, put that into the response and return it.
 void lfs::download_handler(const request_t& request, response_t& response, const server_config::data& cfg)
 {
-  // @FIXME: when the file is too large, git lfs client does it in chunks using range,
-  // so we have to do adapt to that situation.
   const std::string oid = get_oid_from_url(request.path);
 
   std::ifstream file (get_filesystem_path(cfg.file_directory, oid), std::ios::in | std::ios::binary);
