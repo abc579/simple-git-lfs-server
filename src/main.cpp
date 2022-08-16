@@ -5,11 +5,9 @@
 #include "server/server.h"
 #include "log/logger.h"
 
-using request = httplib::Request;
-using response = httplib::Response;
-using ssl_server = httplib::SSLServer;
-
 int main() {
+  using ssl_server = httplib::SSLServer;
+  
   try {
     const auto cfg = server::init();
     ssl_server server (cfg.cert.c_str(), cfg.key.c_str());

@@ -1,7 +1,7 @@
 ##########################################
 ## Compiler.
 CXX = g++
-CXXFLAGS = -std=c++14 -O2 -Wall -Wpedantic -Wextra -fsanitize=address
+CXXFLAGS = -std=c++14 -g3 -Wall -Wpedantic -Wextra
 ##########################################
 ## Sources.
 MAIN_SRC = src/main.cpp
