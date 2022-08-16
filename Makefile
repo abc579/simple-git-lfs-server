@@ -28,10 +28,10 @@ out/lfs_server : $(SRCS_O) $(INCS_3RD_O)
 	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -I$(INC_3RD_FLD) $(SRCS_O) $(INCS_3RD_O) -o $@ $(LDFLAGS)
 
 src/main.o :
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -I$(INC_3RD_FLD) -Isrc/tool -Isrc/server -c src/main.cpp -o $@
+	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -I$(INC_3RD_FLD) -I$(INC_TOOLS) -I$(INC_SERVER) -c src/main.cpp -o $@
 
 src/server/config.o : src/server/config.cpp
-	$(CXX) $(CXXFLAGS) -Isrc/tool -c $^ -o $@
+	$(CXX) $(CXXFLAGS) -I$(INC_TOOLS) -c $^ -o $@
 
 src/lfs.o : src/lfs.cpp
 	$(CXX) $(CXXFLAGS) -I$(INC_3RD_FLD) -I$(INC_TOOLS) -I$(INC_SERVER) -c $^ -o $@
