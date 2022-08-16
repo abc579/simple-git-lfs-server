@@ -38,7 +38,8 @@ This is a very naïve implementation of part of the Git LFS API.
 + [X] Run static analyzers.
 + [X] Encapsulate JSON.
 + [X] Reorganize some stuff, create a folder with file utils or something like that.
-+ [] Rename certain objects.
++ [X] Rename certain objects.
++ [X] Separate some functions from lfs.h.
 + [] Implement Range header.
   
 * Questions.

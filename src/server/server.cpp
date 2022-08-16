@@ -1,11 +1,52 @@
-#include "config.h"
+#include "server.h"
 
-#include <exception>
-#include <iostream>
+#include <memory>
 
-#include "util.h"
+#include "httplib.h"
+#include "lfs.h"
+#include "logger.h"
 
-server::config::data server::config::init() {
+server::lfs_server::lfs_server(const data& cfg, ssl_server& sv,
+                               logger::logger& l)
+    : cfg_{cfg} {
+  server_ = &sv;
+  log_ = &l;
+}
+
+void server::lfs_server::setup_listeners() {
+  server_->set_exception_handler(lfs::exceptions_handler);
+
+  server_->Post(
+      "/objects/batch", [&](const auto& request, auto& response) {
+        if (lfs::process_auth(request, response, cfg_)) {
+          lfs::batch_request_handler(request, response, cfg_, *log_);
+        }
+      });
+
+  server_->Get(R"(/objects/[a-zA-Z0-9]*)",
+                     [&](const auto& request, auto& response) {
+                       if (lfs::process_auth(request, response, cfg_)) {
+                         lfs::download_handler(request, response, cfg_);
+                       }
+                     });
+
+  server_->Put(R"(/[a-zA-Z0-9]*)",
+                     [&](const auto& request, auto& response) {
+                       if (lfs::process_auth(request, response, cfg_)) {
+                         lfs::upload_handler(request, response, cfg_, *log_);
+                       }
+                     });
+
+  server_->Post("/verify", [&](const auto& request, auto& response) {
+    lfs::verify_handler(request, response, cfg_);
+  });
+}
+
+void server::lfs_server::listen() {
+  server_->listen(cfg_.host, cfg_.port);
+}
+
+server::data server::init() {
   data c;
 
   const char* host;
@@ -85,7 +126,7 @@ server::config::data server::config::init() {
   c.cert = cert;
   c.key = key;
 
-  utils::create_directory(file_directory);
+  util::create_directory(file_directory);
 
   return c;
 }

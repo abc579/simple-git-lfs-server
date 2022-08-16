@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-namespace lfs {
+namespace logger {
 
 struct logger_error : public std::exception {
   std::string msg;
@@ -16,10 +16,10 @@ struct logger_error : public std::exception {
   }
 };
 
-struct log {
+struct logger {
   std::ofstream file;
 
-  log();
+  logger();
   void log_message(const std::string&);
 };
-}  // namespace lfs
+}  // namespace logger

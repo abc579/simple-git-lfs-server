@@ -1,60 +1,80 @@
+##########################################
+## Compiler.
 CXX = g++
-CXXFLAGS = -std=c++14 -g3 -Wall -Wpedantic -Wextra -fsanitize=address
-OUT = out/
+CXXFLAGS = -std=c++14 -O2 -Wall -Wpedantic -Wextra -fsanitize=address
 ##########################################
-## Sources
-SRCS = $(addprefix src/, main.cpp server/config.cpp lfs.cpp tool/logger.cpp tool/util.cpp)
-SRCS_O = $(SRCS:.cpp=.o)
+## Sources.
+MAIN_SRC = src/main.cpp
+MAIN_OBJ = $(MAIN_SRC:.cpp=.o)
+#
+LFS_FILES = $(wildcard src/lfs/*)
+LFS_SRCS = $(filter %.cpp, $(LFS_FILES))
+LFS_OBJS = $(LFS_SRCS:.cpp=.o)
+#
+SV_FILES = $(wildcard src/server/*)
+SV_SRCS = $(filter %.cpp, $(SV_FILES))
+SV_OBJS = $(SV_SRCS:.cpp=.o)
+#
+LOG_FILES = $(wildcard src/log/*)
+LOG_SRCS = $(filter %.cpp, $(LOG_FILES))
+LOG_OBJS = $(LOG_SRCS:.cpp=.o)
+#
+UTIL_FILES = $(wildcard src/util/*)
+UTIL_SRCS = $(filter %.cpp, $(UTIL_FILES))
+UTIL_OBJS = $(UTIL_SRCS:.cpp=.o)
+#
+DEP_FILES = $(wildcard third_party/*)
+DEP_SRCS = $(filter %.cpp, $(DEP_FILES))
+DEP_OBJS = $(DEP_SRCS:.cpp=.o)
+#
+ALL_OBJS = $(MAIN_OBJ)  \
+           $(LFS_OBJS)  \
+           $(SV_OBJS)   \
+           $(LOG_OBJS)  \
+           $(UTIL_OBJS) \
+           $(DEP_OBJS)
 ##########################################
-## Includes
-INC_3RD_FLD = third_party/
-INC_TOOLS = src/tool
-INC_SERVER = src/server
-INCS_3RD_SRC = $(addprefix $(INC_3RD_FLD), httplib.cpp json11.cpp base64.cpp)
-INCS_3RD_O = $(INCS_3RD_SRC:.cpp=.o)
+## Link.
+LDFLAGS = -lpthread -lssl -lcrypto
 ##########################################
-## Links
-LDFLAGS = -lssl -lcrypto -lpthread
+## Includes.
+INCS = -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -Ithird_party -Isrc/util -Isrc/log -Isrc/lfs -Isrc/server
+##########################################
+## TARGET
+SLFS = out/lfs_server
 
-# $^ -> prerequisites reference.
-# $@ -> target reference.
+all: build $(MAIN_OBJ)
+	 $(CXX) $(CXXFLAGS) $(INCS) $(ALL_OBJS) -o $(SLFS) $(LDFLAGS)
 
-all : build out/lfs_server
+$(MAIN_OBJ) : $(DEP_OBJS) $(LFS_OBJS) $(SV_OBJS) $(LOG_OBJS) $(UTIL_OBJS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
+
+$(LFS_OBJS) : $(LFS_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
+
+$(SV_OBJS) : $(SV_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
+
+$(LOG_OBJS) : $(LOG_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
+
+$(UTIL_OBJS) : $(UTIL_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
+
+$(DEP_OBJS) : $(DEP_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
 
 build :
-	mkdir -p $(OUT)
-
-out/lfs_server : $(SRCS_O) $(INCS_3RD_O)
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -I$(INC_3RD_FLD) $(SRCS_O) $(INCS_3RD_O) -o $@ $(LDFLAGS)
-
-src/main.o :
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -I$(INC_3RD_FLD) -I$(INC_TOOLS) -I$(INC_SERVER) -c src/main.cpp -o $@
-
-src/server/config.o : src/server/config.cpp
-	$(CXX) $(CXXFLAGS) -I$(INC_TOOLS) -c $^ -o $@
-
-src/lfs.o : src/lfs.cpp
-	$(CXX) $(CXXFLAGS) -I$(INC_3RD_FLD) -I$(INC_TOOLS) -I$(INC_SERVER) -c $^ -o $@
-
-src/tool/logger.o : src/tool/logger.cpp
-	$(CXX) $(CXXFLAGS) -c $^ -o $@
-
-src/tool/util.o : src/tool/util.cpp
-	$(CXX) $(CXXFLAGS) -c $^ -o $@
-
-$(INC_3RD_FLD)httplib.o : $(INC_3RD_FLD)httplib.cpp
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -c $^ -o $@ $(LDFLAGS)
-
-$(INC_3RD_FLD)json11.o : $(INC_3RD_FLD)json11.cpp
-	$(CXX) $(CXXFLAGS) -c $^ -o $@
-
-$(INC_3RD_FLD)base64.o : $(INC_3RD_FLD)base64.cpp
-	$(CXX) $(CXXFLAGS) -c $^ -o $@
+	mkdir -p out
 
 clean :
-	rm -rf $(OUT)
+	rm -rf out
 	rm -f src/*.o
-	rm -f inc/*.o
+	rm -f third_party/*.o
+	rm -f src/lfs/*.o
+	rm -f src/log/*.o
+	rm -f src/server/*.o
+	rm -f src/util/*.o
 	rm -f lfs.log
 
 # If there is a target called clean/all/run then GNUmake could be confused, so we

@@ -1,56 +1,76 @@
-EXECUTABLES	 = $(wildcard *.test)
+##########################################
+## Compiler.
 CXX = g++
-LDFLAGS = -lpthread
 CXXFLAGS = -std=c++14 -g3 -I../src -I../third_party -I../src/tool -I../src/server
+##########################################
+## Sources.
+TEST_FILES = $(wildcard *)
+TEST_SRCS = $(filter %.cpp, $(TEST_FILES))
+TEST_OBJS = $(TEST_SRCS:.cpp=.test)
+#
+LFS_FILES = $(wildcard ../src/lfs/*)
+LFS_SRCS = $(filter %.cpp, $(LFS_FILES))
+LFS_OBJS = $(LFS_SRCS:.cpp=.o)
+#
+SV_FILES = $(wildcard ../src/server/*)
+SV_SRCS = $(filter %.cpp, $(SV_FILES))
+SV_OBJS = $(SV_SRCS:.cpp=.o)
+#
+LOG_FILES = $(wildcard ../src/log/*)
+LOG_SRCS = $(filter %.cpp, $(LOG_FILES))
+LOG_OBJS = $(LOG_SRCS:.cpp=.o)
+#
+UTIL_FILES = $(wildcard ../src/util/*)
+UTIL_SRCS = $(filter %.cpp, $(UTIL_FILES))
+UTIL_OBJS = $(UTIL_SRCS:.cpp=.o)
+#
+DEP_FILES = $(wildcard ../third_party/*)
+DEP_SRCS = $(filter %.cpp, $(DEP_FILES))
+DEP_OBJS = $(DEP_SRCS:.cpp=.o)
+#
+ALL_OBJS = $(LFS_OBJS)  \
+           $(SV_OBJS)   \
+           $(LOG_OBJS)  \
+           $(UTIL_OBJS) \
+           $(DEP_OBJS)
+##########################################
+## Link.
+LDFLAGS = -lpthread -lssl -lcrypto
+## Includes.
+INCS = -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -I../third_party -I../src/util -I../src/log -I../src/lfs -I../src/server
 
-all : test_env.o test_auth.o test_batch_request.o test_base64.o
-	$(CXX) $(CXXFLAGS) test_env.o ../src/server/config.o ../src/tool/util.o ../src/lfs.o ../src/tool/logger.o ../third_party/base64.o ../third_party/httplib.o ../third_party/json11.o -o test_env.test
-	$(CXX) $(CXXFLAGS) test_env.cpp ../src/server/config.o ../src/tool/util.o ../src/tool/logger.o -o test_env.test
-	$(CXX) $(CXXFLAGS) test_auth.cpp ../src/server/config.o ../src/lfs.o ../src/tool/util.o ../src/tool/logger.o ../third_party/base64.o ../third_party/httplib.o ../third_party/json11.o -o test_auth.test
-	$(CXX) $(CXXFLAGS) test_batch_request.o ../src/server/config.o ../src/lfs.o ../src/tool/util.o ../src/tool/logger.o ../third_party/base64.o ../third_party/httplib.o ../third_party/json11.o -o test_batch_request.test
-	$(CXX) $(CXXFLAGS) test_base64.o ../third_party/base64.o -o test_base64.test
+all : $(TEST_OBJS)
 
-test_env.o : ../src/server/config.o ../src/tool/util.o ../src/lfs.o
-	$(CXX) $(CXXFLAGS) -c test_env.cpp -o test_env.o
+$(TEST_OBJS) : $(DEP_OBJS) $(LFS_OBJS) $(SV_OBJS) $(LOG_OBJS) $(UTIL_OBJS)
+	$(CXX) $(CXXFLAGS) $(INCS) $(ALL_OBJS) $(patsubst %.test, %.cpp, $@) -o $@ $(LDFLAGS)
 
-test_auth.o : ../src/server/config.o ../src/lfs.o ../third_party/httplib.o
-	$(CXX) $(CXXFLAGS) -c test_auth.cpp -o test_auth.o
+$(LFS_OBJS) : $(LFS_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
 
-test_batch_request.o : ../src/server/config.o ../src/lfs.o ../third_party/httplib.o ../third_party/json11.o
-	$(CXX) $(CXXFLAGS) -c test_batch_request.cpp -o test_batch_request.o
+$(SV_OBJS) : $(SV_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
 
-test_base64.o : ../third_party/base64.o
-	$(CXX) $(CXXFLAGS) -c test_base64.cpp -o test_base64.o
+$(LOG_OBJS) : $(LOG_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
 
-../src/server/config.o : ../src/server/config.cpp
-	$(CXX) $(CXXFLAGS) -c ../src/server/config.cpp -o $@
+$(UTIL_OBJS) : $(UTIL_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
 
-../src/util.o : ../src/tool/util.cpp
-	$(CXX) $(CXXFLAGS) -c ../src/tool/util.cpp -o $@
-
-../src/lfs.o : ../third_party/json11.o ../third_party/httplib.o ../third_party/base64.o ../src/tool/logger.o ../src/lfs.cpp
-	$(CXX) $(CXXFLAGS) -c ../src/lfs.cpp -o $@
-
-../third_party/json11.o : ../third_party/json11.cpp
-	$(CXX) $(CXXFLAGS) -c ../third_party/json11.cpp -o $@
-
-../third_party/httplib.o : ../third_party/httplib.cpp
-	$(CXX) $(CXXFLAGS) -c ../third_party/httplib.cpp -o $@
-
-../third_party/base64.o : ../third_party/base64.cpp
-	$(CXX) $(CXXFLAGS) -c ../third_party/base64.cpp -o $@
-
-../src/tool/logger.o : ../src/tool/logger.cpp
-	$(CXX) $(CXXFLAGS) -c ../src/tool/logger.cpp -o $@
+$(DEP_OBJS) : $(DEP_SRCS)
+	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
 
 clean :
-	rm -f *.test
-	rm -f *.o
-	rm -f lfs.log
-	rm -f ../src/*.o ../src/tool/*.o ../src/server/*.o 
+	rm -f ../src/*.o
 	rm -f ../third_party/*.o
+	rm -f ../src/lfs/*.o
+	rm -f ../src/log/*.o
+	rm -f ../src/server/*.o
+	rm -f ../src/util/*.o
+	rm -f lfs.log
+	rm -f *.test
 
-run : $(EXECUTABLES)
+
+run : $(TEST_OBJS)
 	for i in $^; do echo $$i; ./$$i || exit 1; echo; done
 
 .PHONY : clean

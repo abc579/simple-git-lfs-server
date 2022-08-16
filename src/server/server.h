@@ -1,10 +1,14 @@
 #pragma once
 
-#include <exception>
 #include <string>
+#include <memory>
+
+#include "httplib.h"
+#include "logger.h"
 
 namespace server {
-namespace config {
+
+using ssl_server = httplib::SSLServer;
 
 class config_error : public std::exception {
  public:
@@ -35,6 +39,19 @@ struct data {
 };
 
 data init();
-}  // namespace config
+
+class lfs_server {
+ public:
+  lfs_server(const data&, ssl_server&, logger::logger&);
+
+ public:
+  void setup_listeners();
+  void listen();
+
+ private:
+  ssl_server *server_;
+  data cfg_;
+  logger::logger *log_;
+};
 
 }  // namespace server

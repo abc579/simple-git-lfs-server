@@ -3,12 +3,12 @@
 #include <iostream>
 
 #include "httplib.h"
-#include "config.h"
+#include "server.h"
 #include "lfs.h"
 
 using request = httplib::Request;
 using response = httplib::Response;
-using server_data = server::config::data;
+using server_data = server::data;
 
 void check_auth_ok() {
   std::cout << "Testing check_auth_ok()...";

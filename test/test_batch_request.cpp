@@ -5,7 +5,7 @@
 #include <string>
 
 #include "httplib.h"
-#include "config.h"
+#include "server.h"
 #include "lfs.h"
 #include "json11.hpp"
 
@@ -31,10 +31,10 @@ void test_json_malformed() {
      }
     ]})";
 
-  server::config::data cfg;
+  server::data cfg;
   response_t response;
   request_t request;
-  lfs::log l;
+  logger::logger l;
 
   request.body = malformed;
 
@@ -60,10 +60,10 @@ void test_json_lacks_oid() {
      }
      ]})";
 
-  server::config::data cfg;
+  server::data cfg;
   response_t response;
   request_t request;
-  lfs::log l;
+  logger::logger l;
 
   request.body = j;
 
@@ -100,7 +100,7 @@ void test_json_lacks_size() {
      }
      ]})";
 
-  server::config::data cfg{"temp", "temp", "temp", 8080, "temp"};
+  server::data cfg{"temp", "temp", "temp", 8080, "temp"};
 
   std::system("mkdir -p temp/5f/70/");
   std::system("fallocate -l 1KiB "
@@ -109,7 +109,7 @@ void test_json_lacks_size() {
 
   response_t response;
   request_t request;
-  lfs::log l;
+  logger::logger l;
 
   request.body = j;
 
@@ -152,7 +152,7 @@ void test_json_operation_unknown() {
      }
      ]})";
 
-  server::config::data cfg{"temp", "temp", "temp", 8080, "temp"};
+  server::data cfg{"temp", "temp", "temp", 8080, "temp"};
 
   std::system("mkdir -p temp/5f/70/");
   std::system("fallocate -l 1KiB "
@@ -161,7 +161,7 @@ void test_json_operation_unknown() {
 
   response_t response;
   request_t request;
-  lfs::log l;
+  logger::logger l;
 
   request.body = j;
 
