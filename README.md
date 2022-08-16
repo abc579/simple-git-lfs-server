@@ -4,7 +4,7 @@ This is a very naïve implementation of the Git LFS API.
 
 The objective of this project is to learn C++ by doing.
 
-# Very Important (but you can skip this section, heh)
+# Very Important (but you can skip this section, hehe)
 
 I am new to C++ and only have experience in database programming (PL
 SQL, SQL and so forth), so I apologise if the quality of this code
@@ -230,3 +230,14 @@ Note: run `make clean` to remove all object files and executables created.
 - [X] Run valgrind to see if we have any leaks.
 - [] Implement Range header.
 - [] Check use case of performing an edition on a png file and see how commits are managed.
+
+# Thanks To
+
+Even though no one is going to see this repository, I would like to thank:
+
+- People behind Git and Git LFS development.
+- The authors of the httplib library.
+- The authors of the json11 library.
+- Rene Nyffenegger for his base64 code snippet.
+- jart because I somehow stumbled upon their cosmopolitan repository and I am learning a lot.
+- rui314 for the exact same reason described before with their chibicc repository.
