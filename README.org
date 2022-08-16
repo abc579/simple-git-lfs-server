@@ -37,8 +37,9 @@ This is a very naïve implementation of part of the Git LFS API.
 + [X] Fix convoluted json construction.
 + [X] Run static analyzers.
 + [X] Encapsulate JSON.
++ [X] Reorganize some stuff, create a folder with file utils or something like that.
 + [] Rename certain objects.
-+ [] Reorganize some stuff, create a folder with file utils or something like that.
++ [] Implement Range header.
   
 * Questions.
 

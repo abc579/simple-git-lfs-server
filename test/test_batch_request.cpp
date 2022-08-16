@@ -4,10 +4,9 @@
 #include <iostream>
 #include <string>
 
-#include "../inc/httplib.h"
-#include "../src/json.h"
-#include "../src/server_config.h"
-#include "../src/simple_git_lfs.h"
+#include "httplib.h"
+#include "config.h"
+#include "lfs.h"
 #include "json11.hpp"
 
 using request_t = httplib::Request;
@@ -32,7 +31,7 @@ void test_json_malformed() {
      }
     ]})";
 
-  server_config::data cfg;
+  server::config::data cfg;
   response_t response;
   request_t request;
   lfs::log l;
@@ -61,7 +60,7 @@ void test_json_lacks_oid() {
      }
      ]})";
 
-  server_config::data cfg;
+  server::config::data cfg;
   response_t response;
   request_t request;
   lfs::log l;
@@ -101,7 +100,7 @@ void test_json_lacks_size() {
      }
      ]})";
 
-  server_config::data cfg{"temp", "temp", "temp", 8080, "temp"};
+  server::config::data cfg{"temp", "temp", "temp", 8080, "temp"};
 
   std::system("mkdir -p temp/5f/70/");
   std::system("fallocate -l 1KiB "
@@ -153,7 +152,7 @@ void test_json_operation_unknown() {
      }
      ]})";
 
-  server_config::data cfg{"temp", "temp", "temp", 8080, "temp"};
+  server::config::data cfg{"temp", "temp", "temp", 8080, "temp"};
 
   std::system("mkdir -p temp/5f/70/");
   std::system("fallocate -l 1KiB "

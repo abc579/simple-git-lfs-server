@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "../inc/base64.h"
+#include "base64.h"
 
 int main() {
   std::cout << "Testing test_base64()...";

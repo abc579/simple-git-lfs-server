@@ -1,10 +1,19 @@
 CXX = g++
 CXXFLAGS = -std=c++14 -g3 -Wall -Wpedantic -Wextra -fsanitize=address
 OUT = out/
-SRCS = $(addprefix src/, main.cpp server_config.cpp simple_git_lfs.cpp logger.cpp util.cpp)
+##########################################
+## Sources
+SRCS = $(addprefix src/, main.cpp server/config.cpp lfs.cpp tool/logger.cpp tool/util.cpp)
 SRCS_O = $(SRCS:.cpp=.o)
-INCS = $(addprefix inc/, httplib.cpp json11.cpp base64.cpp)
-INCS_O = $(INCS:.cpp=.o)
+##########################################
+## Includes
+INC_3RD_FLD = third_party/
+INC_TOOLS = src/tool
+INC_SERVER = src/server
+INCS_3RD_SRC = $(addprefix $(INC_3RD_FLD), httplib.cpp json11.cpp base64.cpp)
+INCS_3RD_O = $(INCS_3RD_SRC:.cpp=.o)
+##########################################
+## Links
 LDFLAGS = -lssl -lcrypto -lpthread
 
 # $^ -> prerequisites reference.
@@ -15,35 +24,32 @@ all : build out/lfs_server
 build :
 	mkdir -p $(OUT)
 
-out/lfs_server : $(SRCS_O) $(INCS_O)
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -Iinc $(SRCS_O) $(INCS_O) -o $@ $(LDFLAGS)
+out/lfs_server : $(SRCS_O) $(INCS_3RD_O)
+	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -I$(INC_3RD_FLD) $(SRCS_O) $(INCS_3RD_O) -o $@ $(LDFLAGS)
 
 src/main.o :
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -Iinc -c src/main.cpp -o $@
+	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -I$(INC_3RD_FLD) -Isrc/tool -Isrc/server -c src/main.cpp -o $@
 
-src/server_config.o : src/server_config.cpp
-	$(CXX) $(CXXFLAGS) -Iinc -c $^ -o $@
+src/server/config.o : src/server/config.cpp
+	$(CXX) $(CXXFLAGS) -Isrc/tool -c $^ -o $@
 
-src/simple_git_lfs.o : src/simple_git_lfs.cpp
-	$(CXX) $(CXXFLAGS) -Iinc -c $^ -o $@
+src/lfs.o : src/lfs.cpp
+	$(CXX) $(CXXFLAGS) -I$(INC_3RD_FLD) -I$(INC_TOOLS) -I$(INC_SERVER) -c $^ -o $@
 
-src/logger.o : src/logger.cpp
+src/tool/logger.o : src/tool/logger.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
-src/util.o : src/util.cpp
+src/tool/util.o : src/tool/util.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
-inc/httplib.o : inc/httplib.cpp
-	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -c inc/httplib.cpp -o inc/httplib.o $(LDFLAGS)
+$(INC_3RD_FLD)httplib.o : $(INC_3RD_FLD)httplib.cpp
+	$(CXX) $(CXXFLAGS) -DCPPHTTPLIB_OPENSSL_SUPPORT=1 -c $^ -o $@ $(LDFLAGS)
 
-inc/json11.o : inc/json11.cpp
+$(INC_3RD_FLD)json11.o : $(INC_3RD_FLD)json11.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
-inc/base64.o : inc/base64.cpp
+$(INC_3RD_FLD)base64.o : $(INC_3RD_FLD)base64.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
-
-run :
-	./$(OUT)$(MAINT)
 
 clean :
 	rm -rf $(OUT)

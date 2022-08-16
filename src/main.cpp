@@ -3,8 +3,8 @@
 
 #include "httplib.h"
 #include "logger.h"
-#include "server_config.h"
-#include "simple_git_lfs.h"
+#include "config.h"
+#include "lfs.h"
 
 int main() {
   using httplib::Request;
@@ -12,7 +12,7 @@ int main() {
   using httplib::SSLServer;
 
   try {
-    const server_config::data cfg{server_config::init()};
+    const server::config::data cfg{server::config::init()};
     lfs::log logger;
 
     // Avoid significant C I/O overhead: we are not going to use C I/O and
@@ -51,7 +51,7 @@ int main() {
     });
 
     server.listen(cfg.host, cfg.port);
-  } catch (const server_config::config_error& e) {
+  } catch (const server::config::config_error& e) {
     std::cerr << "Error in server configuration: " << e.what() << std::endl;
     return EXIT_FAILURE;
   }

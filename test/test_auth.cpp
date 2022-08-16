@@ -2,13 +2,13 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "../inc/httplib.h"
-#include "../src/server_config.h"
-#include "../src/simple_git_lfs.h"
+#include "httplib.h"
+#include "config.h"
+#include "lfs.h"
 
 using request = httplib::Request;
 using response = httplib::Response;
-using server_data = server_config::data;
+using server_data = server::config::data;
 
 void check_auth_ok() {
   std::cout << "Testing check_auth_ok()...";

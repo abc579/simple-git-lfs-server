@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "../src/server_config.h"
+#include "config.h"
 
 // Names of the environment variables.
 #define LFS_HOST           "LFS_HOST"
@@ -25,9 +25,9 @@ void run(const std::unordered_map<std::string, std::string>& env,
 
   try {
     std::cout << "Checking " << checking << " environment variable...";
-    server_config::data cfg = server_config::init();
+    server::config::data cfg = server::config::init();
     assert(false);
-  } catch (server_config::config_error&) {
+  } catch (server::config::config_error&) {
     std::cout << " ok" << std::endl;
     assert(true);
   }
