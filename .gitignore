@@ -1,4 +1,8 @@
 out/
+src/*.o
+src/tool/*.o
+src/server/*.o
+third_party/*.o
 compile_commands.json
 test/test
 .cache/
