@@ -4,7 +4,7 @@ This is a very naïve implementation of the Git LFS API.
 
 The objective of this project is to learn C++ by doing.
 
-# Very Important
+# Very Important (but you can skip this section, heh)
 
 I am new to C++ and only have experience in database programming (PL
 SQL, SQL and so forth), so I apologise if the quality of this code
@@ -190,43 +190,43 @@ Note: run `make clean` to remove all object files and executables created.
 
 # Worklog
 
-+ [X] Create HTTP server that supports POST requests. Library.
-+ [X] Handle HTTP POST request and call a given function, i.e. batch_handler().
-+ [X] Unpack the contents of the HTTP POST request in batch_handler().
-+ [X] Define my own JSON class as an interface to the library.
-+ [X] Create the entity batch_response, this will store the actual response to the API call (/batch/objects).
-+ [X] Create an HTTP server and handle the batch API request on /objects/batch. Respond always with a 200 code status but with a JSON saying that the object was not found.
-+ [X] Decode the request onto a JSON.
-+ [X] Decode that JSON into an object.
-+ [X] Process a "download" operation and return always not found for now.
-+ [X] Process multiple objects in the response.
-+ [X] Implement download operation.
-+ [X] The reason why it might not work is because we uploaded the file with Go.
-+ [X] Implement upload operation.
-+ [X] Reduce compilation time. Improve GNUMake file.
-+ [X] Support verification request.
-+ [X] Setup authentication.
-+ [X] Split headers and .cpp files.
-+ [X] Test for errors.
-+ [X] Fix upload bug.
-+ [X] Check if the verify thingy is firing.
-+ [X] Test with big file sizes.
-+ [X] Test to kill the process while downloading.
-+ [X] Convert http to https server.
-+ [X] Refactor Makefile.
-+ [X] Clean TODOs and FIXMEs.
-+ [X] Refactor: orientate stuff towards one paradigm but do not mix them.
-+ [X] Change b64 algorithm.
-+ [X] Add pthread to Makefiles.
-+ [X] Support all error codes?...
-+ [X] How do we calculate expires_in?
-+ [X] Fix convoluted JSON construction.
-+ [X] Run static analyser.
-+ [X] Encapsulate JSON.
-+ [X] Reorganise some stuff, create a folder with file utils or something like that.
-+ [X] Rename certain objects.
-+ [X] Separate some functions from lfs.h.
-+ [X] Run CPPcheck and fix results.
-+ [X] Run valgrind to see if we have any leaks.
-+ [] Implement Range header.
-+ [] Check use case of performing an edition on a png file and see how commits are managed.
+[X] Create HTTP server that supports POST requests. Library.
+[X] Handle HTTP POST request and call a given function, i.e. batch_handler().
+[X] Unpack the contents of the HTTP POST request in batch_handler().
+[X] Define my own JSON class as an interface to the library.
+[X] Create the entity batch_response, this will store the actual response to the API call (/batch/objects).
+[X] Create an HTTP server and handle the batch API request on /objects/batch. Respond always with a 200 code status but with a JSON saying that the object was not found.
+[X] Decode the request onto a JSON.
+[X] Decode that JSON into an object.
+[X] Process a "download" operation and return always not found for now.
+[X] Process multiple objects in the response.
+[X] Implement download operation.
+[X] The reason why it might not work is because we uploaded the file with Go.
+[X] Implement upload operation.
+[X] Reduce compilation time. Improve GNUMake file.
+[X] Support verification request.
+[X] Setup authentication.
+[X] Split headers and .cpp files.
+[X] Test for errors.
+[X] Fix upload bug.
+[X] Check if the verify thingy is firing.
+[X] Test with big file sizes.
+[X] Test to kill the process while downloading.
+[X] Convert http to https server.
+[X] Refactor Makefile.
+[X] Clean TODOs and FIXMEs.
+[X] Refactor: orientate stuff towards one paradigm but do not mix them.
+[X] Change b64 algorithm.
+[X] Add pthread to Makefiles.
+[X] Support all error codes?...
+[X] How do we calculate expires_in?
+[X] Fix convoluted JSON construction.
+[X] Run static analyser.
+[X] Encapsulate JSON.
+[X] Reorganise some stuff, create a folder with file utils or something like that.
+[X] Rename certain objects.
+[X] Separate some functions from lfs.h.
+[X] Run CPPcheck and fix results.
+[X] Run valgrind to see if we have any leaks.
+[] Implement Range header.
+[] Check use case of performing an edition on a png file and see how commits are managed.
