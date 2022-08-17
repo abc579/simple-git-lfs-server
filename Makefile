@@ -1,7 +1,7 @@
 ##########################################
 ## Compiler.
 CXX = g++
-CXXFLAGS = -std=c++14 -g3 -Wall -Wpedantic -Wextra
+CXXFLAGS = -std=c++14 -O3 -Wall -Wpedantic -Wextra
 ##########################################
 ## Sources.
 MAIN_SRC = src/main.cpp

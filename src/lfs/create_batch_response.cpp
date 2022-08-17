@@ -51,6 +51,8 @@ void create_upload_batch_response(const lfs::json_array_t& objects,
                                   lfs::batch_response& br) {
   using namespace lfs;
 
+  static const error empty_error {};
+  
   for (const auto& o : objects) {
     object obj{o["oid"].string_value(), o["size"].int_value()};
 
@@ -66,7 +68,7 @@ void create_upload_batch_response(const lfs::json_array_t& objects,
                       cfg.verify_object_path),
     };
 
-    br.objects.push_back({actions, verify, {}, obj});
+    br.objects.push_back({actions, verify, empty_error, obj});
   }
 }
 
@@ -75,7 +77,7 @@ lfs::batch_response lfs::create_batch_response(const std::string& op,
                                                const server::data& cfg,
                                                const std::string& authorization,
                                                logger::logger& log) {
-  batch_response br;
+  batch_response br {};
 
   if (op == "download") {
     create_download_batch_response(objects, cfg, authorization, log, br);
