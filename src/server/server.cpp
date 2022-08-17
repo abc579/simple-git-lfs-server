@@ -1,8 +1,11 @@
 #include "server.h"
 
+#include <fstream>
+
 #include "httplib.h"
 #include "lfs.h"
 #include "logger.h"
+#include "util.h"
 
 server::lfs_server::lfs_server(const data& cfg, ssl_server& sv,
                                logger::logger& l)
@@ -54,6 +57,7 @@ server::data server::init() {
   const char* cert;
   const char* key;
 
+  // Check environment variables.
   host = std::getenv("LFS_HOST");
 
   if (host == nullptr) {
@@ -122,6 +126,18 @@ server::data server::init() {
   c.cert = cert;
   c.key = key;
 
+  // Check if the cert and key provided exist in the directory.
+  if (!util::can_open(c.cert)) {
+    throw config_error{"The environment variable LFS_CERT points to a non "
+                       "existant certificate."};
+  }
+
+  if (!util::can_open(c.key)) {
+    throw config_error{"The environment variable LFS_KEY points to a non "
+                       "existant private key."};
+  }
+
+  // Create the directory where all files are going to be stored.
   util::create_directory(file_directory);
 
   return c;

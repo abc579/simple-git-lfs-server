@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run this after `make`.
+# Run this after `make` and after creating your own cert and private key.
 
 LFS_HOST="localhost"
 LFS_PORT="9999"
