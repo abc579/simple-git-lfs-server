@@ -139,7 +139,7 @@ openssl req -x509 -sha256 -nodes -days 2100 -newkey rsa:2048 -keyout mine.key -o
    The property `sslverify` is set to `false` because our cert is a self signed one.
 ```
   [lfs]
-    url = "https://localhost:8080/"
+    url = "https://localhost:9999/"
 
   [http]
     sslverify = false
@@ -235,8 +235,14 @@ stored. Remember, the one we specified in `LFS_FILE_DIRECTORY`.
 - [X] Run valgrind to see if we have any leaks.
 - [X] Implement not found pages.
 - [X] Check use case of performing an edition on a png file and see how commits are managed.
-- [ ] Try installation in a docker image and prepare dockerfile.
-- [ ] Try to create the server in a remote server and see how long it takes to download/upload 1 GiB files.
+- [X] Try installation in a docker image and prepare dockerfile.
+- [ ] Support Google Cloud Storage:
+      https://github.com/googleapis/google-cloud-cpp/blob/main/google/cloud/storage/README.md
+      I think it is just matter of changing the part where we are going
+      to the file system to save and retrieve files. Now, the idea is to
+      make calls to the Google API using JSONs instead. We will also
+      need an OAUTH_TOKEN:
+      https://cloud.google.com/storage/docs/authentication#apiauth.
 
 # Thanks To
 
