@@ -71,27 +71,15 @@ section:
 
 # Questions
 
-- [] Investigate how opening a file works and understand it. For
-  instance, why are we using a vector of unsigned chars? What is up with
-  iterators?
-- [] What happens when we remove objects? Do they have to be deleted
-  from the server too?
-- [] How do people really manage dependencies in C++? I do have two for
-  now and the way I proceeded does not look promising. I saw some like
-  conan.io, vcpkg, etc.
-- [] How do people structure source code and header files?
-- [] How can we speed compilation times? Is there a risk of cyclic
-  dependencies?
-- [] Why does the API not require auth for the verify callback?
-  Furthermore, the reference Go server crashes if the object does not
-  exist...
-- [] When I am downloading a repository with very large files, if I kill
-  the process in between, the server seems to keep using a lot of CPU,
-  but I am kinda lost on how to avoid that.
-- [] Regarding authentication, do I only have to check the
-  "Authorization" header? I do not quite understand the ssh part.
-- [] By implementing the range header, is there a risk of too much I/O
-  operations? Should I implement this?
+- [ ] Investigate how opening a file works and understand it. For instance, why are we using a vector of unsigned chars? What is up with iterators?
+- [ ] What happens when we remove objects? Do they have to be deleted from the server too?
+- [ ] How do people really manage dependencies in C++? I do have two for now and the way I proceeded does not look promising. I saw some like conan.io, vcpkg, etc.
+- [ ] How do people structure source code and header files? 
+- [ ] How can we speed compilation times? Is there a risk of cyclic dependencies?
+- [ ] Why does the API not require auth for the verify callback? Furthermore, the reference Go server crashes if the object does not exist...
+- [ ] When I am downloading a repository with very large files, if I kill the process in between, the server seems to keep using a lot of CPU, but I am kinda lost on how to avoid that.
+- [ ] Regarding authentication, do I only have to check the "Authorization" header? I do not quite understand the ssh part.
+- [ ] By implementing the range header, is there a risk of too much I/O operations? Should I implement this?
 
 # Not Supported
 
