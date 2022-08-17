@@ -1,7 +1,5 @@
 #include "server.h"
 
-#include <memory>
-
 #include "httplib.h"
 #include "lfs.h"
 #include "logger.h"
@@ -16,26 +14,24 @@ server::lfs_server::lfs_server(const data& cfg, ssl_server& sv,
 void server::lfs_server::setup_listeners() {
   server_->set_exception_handler(lfs::exceptions_handler);
 
-  server_->Post(
-      "/objects/batch", [&](const auto& request, auto& response) {
-        if (lfs::process_auth(request, response, cfg_)) {
-          lfs::batch_request_handler(request, response, cfg_, *log_);
-        }
-      });
+  server_->Post("/objects/batch", [&](const auto& request, auto& response) {
+    if (lfs::process_auth(request, response, cfg_)) {
+      lfs::batch_request_handler(request, response, cfg_, *log_);
+    }
+  });
 
   server_->Get(R"(/objects/[a-zA-Z0-9]*)",
-                     [&](const auto& request, auto& response) {
-                       if (lfs::process_auth(request, response, cfg_)) {
-                         lfs::download_handler(request, response, cfg_);
-                       }
-                     });
+               [&](const auto& request, auto& response) {
+                 if (lfs::process_auth(request, response, cfg_)) {
+                   lfs::download_handler(request, response, cfg_);
+                 }
+               });
 
-  server_->Put(R"(/[a-zA-Z0-9]*)",
-                     [&](const auto& request, auto& response) {
-                       if (lfs::process_auth(request, response, cfg_)) {
-                         lfs::upload_handler(request, response, cfg_, *log_);
-                       }
-                     });
+  server_->Put(R"(/[a-zA-Z0-9]*)", [&](const auto& request, auto& response) {
+    if (lfs::process_auth(request, response, cfg_)) {
+      lfs::upload_handler(request, response, cfg_, *log_);
+    }
+  });
 
   server_->Post("/verify", [&](const auto& request, auto& response) {
     lfs::verify_handler(request, response, cfg_);

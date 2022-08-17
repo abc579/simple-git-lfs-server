@@ -89,9 +89,9 @@ section:
   the process in between, the server seems to keep using a lot of CPU,
   but I am kinda lost on how to avoid that.
 - [] Regarding authentication, do I only have to check the
-  "Authorization" header?
+  "Authorization" header? I do not quite understand the ssh part.
 - [] By implementing the range header, is there a risk of too much I/O
-  operations?
+  operations? Should I implement this?
 
 # Not Supported
 
@@ -186,7 +186,12 @@ The Git LFS client will prompt you again to type your credentials; after that, i
 you can always pull that particular object by issuing this command: `git lfs pull --include "testing_stuff.bin"` If everything went
 fine, you should see the original file now and not the text pointer.
 
-Note: run `make clean` to remove all object files and executables created.
+Note: you can run `make clean` to remove all object files and
+executables created. _This will not delete the file directory._
+
+Second Note: if you do not plan to use the server anymore, do not forget
+to remove the file directory where all files are going to be
+stored. Remember, the one we specified in `LFS_FILE_DIRECTORY`.
 
 # Worklog
 
@@ -203,7 +208,7 @@ Note: run `make clean` to remove all object files and executables created.
 - [X] Implement download operation.
 - [X] The reason why it might not work is because we uploaded the file with Go.
 - [X] Implement upload operation.
-- [X] Reduce compilation time. Improve GNUMake file.
+- [X] Reduce compilation time. Improve GNU Make file.
 - [X] Support verification request.
 - [X] Setup authentication.
 - [X] Split headers and .cpp files.
@@ -228,8 +233,10 @@ Note: run `make clean` to remove all object files and executables created.
 - [X] Separate some functions from lfs.h.
 - [X] Run CPPcheck and fix results.
 - [X] Run valgrind to see if we have any leaks.
-- [] Implement Range header.
-- [] Check use case of performing an edition on a png file and see how commits are managed.
+- [X] Implement not found pages.
+- [X] Check use case of performing an edition on a png file and see how commits are managed.
+- [ ] Try installation in a docker image and prepare dockerfile.
+- [ ] Try to create the server in a remote server and see how long it takes to download/upload 1 GiB files.
 
 # Thanks To
 
