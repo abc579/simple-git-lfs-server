@@ -2,22 +2,20 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "server.h"
-#include "logger.h"
 #include "util.h"
 
 void util::save_file(const std::string& oid, const std::string& raw,
-                     const server::data& cfg, logger::logger& logger) {
+                     const server::data& cfg) {
   const auto oid_data = split_oid(oid);
 
   if (!util::directory_exists(cfg.file_directory + '/' +
                                oid_data.parent_dir)) {
     if (util::create_directory(cfg.file_directory + '/' +
                                 oid_data.parent_dir) == -1) {
-      std::stringstream ss;
-      ss << "Could not create directory " << oid_data.parent_dir;
-      logger.log_message(ss.str());
+      std::cerr << "Could not create directory " << oid_data.parent_dir;
     }
   }
 
@@ -25,9 +23,7 @@ void util::save_file(const std::string& oid, const std::string& raw,
                                '/' + oid_data.child_dir)) {
     if (util::create_directory(cfg.file_directory + '/' + oid_data.parent_dir +
                                 '/' + oid_data.child_dir) == -1) {
-      std::stringstream ss;
-      ss << "Could not create directory " << oid_data.child_dir;
-      logger.log_message(ss.str());
+      std::cerr << "Could not create directory " << oid_data.child_dir;
     }
   }
 

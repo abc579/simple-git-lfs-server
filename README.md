@@ -224,6 +224,7 @@ stored. Remember, the one we specified in `LFS_FILE_DIRECTORY`.
 - [X] Implement not found pages.
 - [X] Check use case of performing an edition on a png file and see how commits are managed.
 - [X] Try installation in a docker image and prepare dockerfile.
+- [ ] Error handling while creating or opening files.
 - [ ] Support Google Cloud Storage:
       https://github.com/googleapis/google-cloud-cpp/blob/main/google/cloud/storage/README.md
       I think it is just matter of changing the part where we are going

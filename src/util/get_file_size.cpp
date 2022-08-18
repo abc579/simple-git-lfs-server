@@ -2,15 +2,13 @@
 #include <ios>
 #include <sstream>
 #include <string>
+#include <iostream>
 
-#include "logger.h"
 #include "util.h"
 
-size_t util::get_file_size(const std::string& path, logger::logger& logger) {
+size_t util::get_file_size(const std::string& path) {
   if (!can_open(path)) {
-    std::stringstream ss;
-    ss << "get_file_size(): Could not open file " << path;
-    logger.log_message(ss.str());
+    std::cerr << "get_file_size(): Could not open file " << path;
     return 0;
   }
 

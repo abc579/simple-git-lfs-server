@@ -1,13 +1,11 @@
 #include <string>
 
 #include "lfs.h"
-#include "logger.h"
 #include "server.h"
 
 void create_download_batch_response(const lfs::json_array_t& objects,
                                     const server::data& cfg,
                                     const std::string& authorization,
-                                    logger::logger& log,
                                     lfs::batch_response& br) {
   using namespace lfs;
 
@@ -32,7 +30,7 @@ void create_download_batch_response(const lfs::json_array_t& objects,
     // it.
     if (size == 0) {
       obj.size = util::get_file_size(
-          util::get_git_fs_path(cfg.file_directory, oid), log);
+          util::get_git_fs_path(cfg.file_directory, oid));
     }
 
     operation actions = {
@@ -75,12 +73,11 @@ void create_upload_batch_response(const lfs::json_array_t& objects,
 lfs::batch_response lfs::create_batch_response(const std::string& op,
                                                const json_array_t& objects,
                                                const server::data& cfg,
-                                               const std::string& authorization,
-                                               logger::logger& log) {
+                                               const std::string& authorization) {
   batch_response br {};
 
   if (op == "download") {
-    create_download_batch_response(objects, cfg, authorization, log, br);
+    create_download_batch_response(objects, cfg, authorization, br);
   } else if (op == "upload") {
     create_upload_batch_response(objects, cfg, authorization, br);
   }

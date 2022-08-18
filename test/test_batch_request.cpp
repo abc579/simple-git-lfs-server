@@ -34,12 +34,11 @@ void test_json_malformed() {
   server::data cfg;
   response_t response;
   request_t request;
-  logger::logger l;
 
   request.body = malformed;
 
   try {
-    lfs::batch_request_handler(request, response, cfg, l);
+    lfs::batch_request_handler(request, response, cfg);
     assert(false);
   } catch (const lfs::json_parse_error&) {
     assert(true);
@@ -63,13 +62,12 @@ void test_json_lacks_oid() {
   server::data cfg;
   response_t response;
   request_t request;
-  logger::logger l;
 
   request.body = j;
 
   try {
     request.set_header("Authorization", "Basic test");
-    lfs::batch_request_handler(request, response, cfg, l);
+    lfs::batch_request_handler(request, response, cfg);
     assert(true);
 
     const auto new_response = response.body;
@@ -109,13 +107,12 @@ void test_json_lacks_size() {
 
   response_t response;
   request_t request;
-  logger::logger l;
 
   request.body = j;
 
   try {
     request.set_header("Authorization", "Basic test");
-    lfs::batch_request_handler(request, response, cfg, l);
+    lfs::batch_request_handler(request, response, cfg);
     assert(true);
 
     const auto new_response = response.body;
@@ -161,13 +158,12 @@ void test_json_operation_unknown() {
 
   response_t response;
   request_t request;
-  logger::logger l;
 
   request.body = j;
 
   try {
     request.set_header("Authorization", "Basic test");
-    lfs::batch_request_handler(request, response, cfg, l);
+    lfs::batch_request_handler(request, response, cfg);
     assert(true);
 
     const auto new_response = response.body;

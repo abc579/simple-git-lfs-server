@@ -2,12 +2,10 @@
 
 #include "server.h"
 #include "lfs.h"
-#include "logger.h"
 
 void lfs::process_batch_request(const json_t& request, response_t& response,
                                 const server::data& cfg,
-                                const std::string& authorization,
-                                logger::logger& logger) {
+                                const std::string& authorization) {
   const auto objects = request["objects"].array_items();
 
   // @NOTE(lev): API is silent about this, but since there is no
@@ -28,7 +26,7 @@ void lfs::process_batch_request(const json_t& request, response_t& response,
   const auto operation = temp_op;
 
   batch_response br{
-      create_batch_response(operation, objects, cfg, authorization, logger)};
+      create_batch_response(operation, objects, cfg, authorization)};
 
   response.set_header("Accept", ACCEPT_LFS);
 

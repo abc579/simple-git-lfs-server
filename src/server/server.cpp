@@ -4,14 +4,11 @@
 
 #include "httplib.h"
 #include "lfs.h"
-#include "logger.h"
 #include "util.h"
 
-server::lfs_server::lfs_server(const data& cfg, ssl_server& sv,
-                               logger::logger& l)
+server::lfs_server::lfs_server(const data& cfg, ssl_server& sv)
     : cfg_{cfg} {
   server_ = &sv;
-  log_ = &l;
 }
 
 void server::lfs_server::setup_listeners() {
@@ -19,7 +16,7 @@ void server::lfs_server::setup_listeners() {
 
   server_->Post("/objects/batch", [&](const auto& request, auto& response) {
     if (lfs::process_auth(request, response, cfg_)) {
-      lfs::batch_request_handler(request, response, cfg_, *log_);
+      lfs::batch_request_handler(request, response, cfg_);
     }
   });
 
@@ -32,7 +29,7 @@ void server::lfs_server::setup_listeners() {
 
   server_->Put(R"(/[a-zA-Z0-9]*)", [&](const auto& request, auto& response) {
     if (lfs::process_auth(request, response, cfg_)) {
-      lfs::upload_handler(request, response, cfg_, *log_);
+      lfs::upload_handler(request, response, cfg_);
     }
   });
 

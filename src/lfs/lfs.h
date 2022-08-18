@@ -4,7 +4,6 @@
 
 #include "httplib.h"
 #include "json11.hpp"
-#include "logger.h"
 #include "server.h"
 #include "util.h"
 
@@ -96,18 +95,16 @@ using json_array_t = json11::Json::array;
 
 void exceptions_handler(const request_t &, response_t &, std::exception_ptr);
 void batch_request_handler(const request_t &, response_t &,
-                           const server::data &, logger::logger &);
+                           const server::data &);
 void download_handler(const request_t &, response_t &, const server::data &);
-void upload_handler(const request_t &, response_t &, const server::data &,
-                    logger::logger &);
+void upload_handler(const request_t &, response_t &, const server::data &);
 void verify_handler(const request_t &, response_t &, const server::data &);
 bool process_auth(const request_t &, response_t &, const server::data &);
 bool parse_auth(const request_t &, util::user_data &);
 json_t parse_json(const std::string &, std::string &);
 void process_batch_request(const json_t &, response_t &, const server::data &,
-                           const std::string &, logger::logger &);
+                           const std::string &);
 batch_response create_batch_response(const std::string &, const json_array_t &,
-                                     const server::data &, const std::string &,
-                                     logger::logger &);
+                                     const server::data &, const std::string &);
 std::string encode_batch_response(const batch_response &, const std::string &);
 }  // namespace lfs

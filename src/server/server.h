@@ -1,10 +1,9 @@
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "httplib.h"
-#include "logger.h"
 
 namespace server {
 
@@ -42,16 +41,15 @@ data init();
 
 class lfs_server {
  public:
-  lfs_server(const data&, ssl_server&, logger::logger&);
+  lfs_server(const data&, ssl_server&);
 
  public:
   void setup_listeners();
   void listen();
 
  private:
-  ssl_server *server_;
+  ssl_server* server_;
   data cfg_;
-  logger::logger *log_;
 };
 
 }  // namespace server

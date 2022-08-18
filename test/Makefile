@@ -1,7 +1,7 @@
 ##########################################
 ## Compiler.
 CXX = g++
-CXXFLAGS = -std=c++14 -g3 -I../src -I../third_party -I../src/tool -I../src/server
+CXXFLAGS = -std=c++14 -O3 -I../src -I../third_party -I../src/tool -I../src/server
 ##########################################
 ## Sources.
 TEST_FILES = $(wildcard *)
