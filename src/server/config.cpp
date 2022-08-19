@@ -4,16 +4,17 @@
 
 #include "util.h"
 
+using namespace server;
 using namespace util;
 
-server::config::config() {
+config::config() {
   ensure_env_vars_not_empty();
   ensure_port_is_numeric();
   ensure_key_cert_exists();
   create_directory(file_directory_);
 }
 
-void server::config::ensure_env_vars_not_empty() {
+void config::ensure_env_vars_not_empty() {
   host_ = get_env_var_or_throw(
       "LFS_HOST", "The environment variable LFS_HOST is mandatory.");
   user_ = get_env_var_or_throw(
@@ -35,7 +36,7 @@ void server::config::ensure_env_vars_not_empty() {
       "The environment variable LFS_STORAGE_OPTION is mandatory.");
 }
 
-void server::config::ensure_port_is_numeric() {
+void config::ensure_port_is_numeric() {
   auto port = get_env_var_or_throw(
       "LFS_PORT", "The environment variable LFS_PORT is mandatory.");
 
@@ -50,8 +51,8 @@ void server::config::ensure_port_is_numeric() {
   }
 }
 
-std::string server::config::get_env_var_or_throw(const char* env,
-                                                 const std::string& error) {
+std::string config::get_env_var_or_throw(const char* env,
+                                         const std::string& error) {
   const char* e;
   if ((e = std::getenv(env)) == nullptr) {
     throw config_error{error};
@@ -59,7 +60,7 @@ std::string server::config::get_env_var_or_throw(const char* env,
   return std::string(e);
 }
 
-void server::config::ensure_key_cert_exists() {
+void config::ensure_key_cert_exists() {
   if (!can_open(cert_)) {
     throw config_error{"The environment variable LFS_CERT points to a non "
                        "existant certificate."};
