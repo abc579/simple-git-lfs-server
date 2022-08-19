@@ -24,7 +24,11 @@ class json_parse_error : public std::exception {
   std::string err_;
 };
 
-enum class http_response_codes { ok = 200, auth_required = 401 };
+enum class http_response_codes {
+  ok = 200,
+  auth_required = 401,
+  internal_error = 500
+};
 
 enum class object_error_codes { not_found = 404 };
 

@@ -10,8 +10,8 @@ void google_storage::write_file(const std::string &, const std::string &){
 
 };
 
-std::vector<unsigned char> google_storage::read_file(const std::string &) {
-  return {};
+std::string google_storage::read_file(const std::string &) {
+  return "";
 };
 
 bool google_storage::file_exists(const std::string &) {

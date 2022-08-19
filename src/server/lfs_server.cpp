@@ -1,6 +1,7 @@
 #include "lfs_server.h"
 
 #include "base64.h"
+#include "istorage.h"
 #include "lfs.h"
 #include "util.h"
 
@@ -80,16 +81,20 @@ void lfs_server::download_handler(const request_t& request,
   const auto oid = get_path_from_url(request.path);
   const auto binary_file = storage_->read_file(oid);
   response.set_header("Accept", ACCEPT_LFS);
-  response.set_content(std::string(binary_file.begin(), binary_file.end()),
-                       "application/octet-stream");
+  response.set_content(binary_file, "application/octet-stream");
   response.status = static_cast<int>(http_response_codes::ok);
 }
 
 void lfs_server::upload_handler(const request_t& request,
                                 response_t& response) {
   const auto oid = get_path_from_url(request.path);
-  storage_->write_file(oid, request.body);
-  response.status = static_cast<int>(http_response_codes::ok);
+  try {
+    storage_->write_file(oid, request.body);
+    response.status = static_cast<int>(http_response_codes::ok);
+  } catch (const storage::storage_exception& se) {
+    response.status = static_cast<int>(http_response_codes::internal_error);
+    std::cerr << se.what() << std::endl;
+  };
 }
 
 void lfs_server::verify_handler(const request_t& request,
