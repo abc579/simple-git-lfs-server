@@ -7,7 +7,7 @@ namespace storage {
 
 class google_storage : public istorage {
  public:
-  google_storage(const std::string&);
+  explicit google_storage(const std::string&);
   ~google_storage() = default;
 
  public:
