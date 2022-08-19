@@ -1,11 +1,11 @@
 #include <string>
 #include <vector>
 
-#include "storage.h"
+#include "istorage.h"
 
 namespace storage {
 
-class local_storage : public storage::storage {
+class local_storage : public istorage {
  public:
   explicit local_storage(const std::string &);
   ~local_storage() = default;

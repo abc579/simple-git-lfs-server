@@ -6,7 +6,7 @@
 #include "httplib.h"
 #include "json11.hpp"
 #include "lfs.h"
-#include "storage.h"
+#include "istorage.h"
 
 namespace server {
 
@@ -20,7 +20,7 @@ using json_array_t = json11::Json::array;
 
 class lfs_server {
  public:
-  lfs_server(config &, ssl_server &, storage::storage &);
+  lfs_server(config &, ssl_server &, storage::istorage &);
 
  public:
   void listen();
@@ -60,7 +60,7 @@ class lfs_server {
  private:
   ssl_server *server_;
   config *cfg_;
-  storage::storage *storage_;
+  storage::istorage *storage_;
 };
 
 }  // namespace server

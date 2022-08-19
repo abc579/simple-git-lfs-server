@@ -8,7 +8,7 @@ using namespace server;
 using namespace util;
 using namespace lfs;
 
-lfs_server::lfs_server(config& cfg, ssl_server& sv, storage::storage& storage) {
+lfs_server::lfs_server(config& cfg, ssl_server& sv, storage::istorage& storage) {
   server_ = &sv;
   cfg_ = &cfg;
   storage_ = &storage;

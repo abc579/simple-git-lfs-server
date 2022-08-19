@@ -5,7 +5,7 @@
 
 namespace storage {
 
-class storage {
+class istorage {
  public:
   virtual void write_file(const std::string& oid,
                           const std::string& raw) = 0; /* Upload. */
@@ -14,7 +14,7 @@ class storage {
   virtual bool file_exists(const std::string& oid) = 0;
   virtual size_t get_file_size(const std::string& oid) = 0;
 
-  virtual ~storage() {}
+  virtual ~istorage() {}
 };
 
 };  // namespace storage

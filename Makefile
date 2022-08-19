@@ -19,7 +19,8 @@ DEP_FILES = $(wildcard third_party/*)
 DEP_SRCS = $(filter %.cpp, $(DEP_FILES))
 DEP_OBJS = $(DEP_SRCS:.cpp=.o)
 #
-STOR_FILES = $(wildcard src/storage/local/*)
+STOR_FILES  = src/get_storage_option.cpp
+STOR_FILES += $(wildcard src/storage/local/*)
 STOR_FILES += $(wildcard src/storage/google/*)
 STOR_SRCS = $(filter %.cpp, $(STOR_FILES))
 STOR_OBJS = $(STOR_SRCS:.cpp=.o)
@@ -57,7 +58,6 @@ $(DEP_OBJS) : $(DEP_SRCS)
 $(STOR_OBJS) : $(STOR_SRCS)
 	$(CXX) $(CXXFLAGS) $(INCS) -c $(patsubst %.o, %.cpp, $@) -o $@
 
-
 build :
 	mkdir -p out
 
@@ -65,6 +65,7 @@ clean :
 	rm -rf out
 	rm -f src/*.o
 	rm -f third_party/*.o
+	rm -f src/storage/*.o	
 	rm -f src/storage/local/*.o
 	rm -f src/storage/google/*.o
 	rm -f src/server/*.o
