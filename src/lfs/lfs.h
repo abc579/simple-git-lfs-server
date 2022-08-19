@@ -1,20 +1,13 @@
 #pragma once
 
 #include <string>
-
-#include "httplib.h"
-#include "json11.hpp"
-#include "server.h"
-#include "util.h"
+#include <vector>
 
 #define CONTENT_TYPE_LFS "application/vnd.git-lfs+json"
 #define HASH_ALGO        "sha256"
 #define ACCEPT_LFS       "application/vnd.git-lfs"
 #define AUTH_ERROR \
   R"({ "message": "Credentials needed", "documentation_url": "https://lfs-server.com/docs/errors"})"
-// @TODO: Implement --> 404
-#define REPOSITORY_NOT_FOUND_ERROR \
-  R"({ "message": "Not found", "documentation_url": "https://lfs-server.com/docs/errors"})"
 
 namespace lfs {
 
@@ -31,11 +24,7 @@ class json_parse_error : public std::exception {
   std::string err_;
 };
 
-enum class http_response_codes {
-  ok = 200,
-  auth_required = 401,
-  partial_content = 206
-};
+enum class http_response_codes { ok = 200, auth_required = 401 };
 
 enum class object_error_codes { not_found = 404 };
 
@@ -86,25 +75,4 @@ struct batch_response {
   const std::string hash_algo{HASH_ALGO};
 };
 
-// Handy typedefs.
-using request_t = httplib::Request;
-using response_t = httplib::Response;
-using json_t = json11::Json;
-using json_object_t = json11::Json::object;
-using json_array_t = json11::Json::array;
-
-void exceptions_handler(const request_t &, response_t &, std::exception_ptr);
-void batch_request_handler(const request_t &, response_t &,
-                           const server::data &);
-void download_handler(const request_t &, response_t &, const server::data &);
-void upload_handler(const request_t &, response_t &, const server::data &);
-void verify_handler(const request_t &, response_t &, const server::data &);
-bool process_auth(const request_t &, response_t &, const server::data &);
-bool parse_auth(const request_t &, util::user_data &);
-json_t parse_json(const std::string &, std::string &);
-void process_batch_request(const json_t &, response_t &, const server::data &,
-                           const std::string &);
-batch_response create_batch_response(const std::string &, const json_array_t &,
-                                     const server::data &, const std::string &);
-std::string encode_batch_response(const batch_response &, const std::string &);
 }  // namespace lfs

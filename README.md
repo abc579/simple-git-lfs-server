@@ -39,26 +39,6 @@ section:
 - Project Directory Structure: _I really have no idea_ how to address
   this. I decided to take a look at C++ GitHub repositories but I found
   so many different forms and styles that I ended up very confused.
-  Game Development, OS development, HTTP Web Applications... In the end,
-  I adopted a _"style"_ that sounded familiar to me, which is:
-  
-  1. Try to create folders that represent modules.
-  2. Create a header file inside each module that contains functions declarations.
-  3. For each function in the header, create its own implementation (.cpp) file.
-  
-  Oh well... The good thing about this approach is that implementation
-  files (.cpp) are very small, so it feels good to modify them. Each
-  file has its own responsibility. Or that was what I intended to do.
-  
-  Also, when I need to create a new function, I know that I only have to add
-  it in the header file and then create its corresponding cpp file.
-    
-  Nonetheless, it has its own problems. I have noticed that compilation
-  times might be slow using this approach and -which is more important-
-  the general feel is that of chaos, or perhaps difficult to follow. Not
-  to mention that, _for now,_ I did not run into a cyclic
-  dependency... Is this possible?  I feel like following this style
-  might trigger that very undesired outcome sooner or later...
   
 - Decoupling: the ideal thing to do is to avoid having references to
   types that come from libraries. This way, if tomorrow we decide to
