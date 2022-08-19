@@ -32,9 +32,8 @@ section:
   address this. _Note:_ I was not familiar with dependency management
   systems since in PL SQL everything is embedded in the Oracle Database.
 
-- Tests: _yes, that too._ Doing tests with `asserts` is not very good. I
-  have seen some frameworks like GoogleTest; looks good. I might add it
-  in the future.
+- Tests: _yes, that too._ I have seen some frameworks like GoogleTest;
+  looks good. I might add it in the future.
 
 - Project Directory Structure: _I really have no idea_ how to address
   this. I decided to take a look at C++ GitHub repositories but I found
@@ -54,7 +53,7 @@ section:
 - [ ] Investigate how opening a file works and understand it. For instance, why are we using a vector of unsigned chars? What is up with iterators?
 - [ ] What happens when we remove objects? Do they have to be deleted from the server too?
 - [ ] How do people really manage dependencies in C++? I do have two for now and the way I proceeded does not look promising. I saw some like conan.io, vcpkg, etc.
-- [ ] How do people structure source code and header files? 
+- [ ] How do people structure source code and header files?  What paradigms should we use here?
 - [ ] How can we speed compilation times? Is there a risk of cyclic dependencies?
 - [ ] Why does the API not require auth for the verify callback? Furthermore, the reference Go server crashes if the object does not exist...
 - [ ] When I am downloading a repository with very large files, if I kill the process in between, the server seems to keep using a lot of CPU, but I am kinda lost on how to avoid that.
@@ -204,6 +203,8 @@ stored. Remember, the one we specified in `LFS_FILE_DIRECTORY`.
 - [X] Implement not found pages.
 - [X] Check use case of performing an edition on a png file and see how commits are managed.
 - [X] Try installation in a docker image and prepare dockerfile.
+- [X] Make it more extensible.
+- [ ] Get rid of library coupling.
 - [ ] Error handling while creating or opening files.
 - [ ] Support Google Cloud Storage:
       https://github.com/googleapis/google-cloud-cpp/blob/main/google/cloud/storage/README.md

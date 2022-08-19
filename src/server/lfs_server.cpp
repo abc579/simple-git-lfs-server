@@ -8,7 +8,8 @@ using namespace server;
 using namespace util;
 using namespace lfs;
 
-lfs_server::lfs_server(config& cfg, ssl_server& sv, storage::istorage& storage) {
+lfs_server::lfs_server(config& cfg, ssl_server& sv,
+                       storage::istorage& storage) {
   server_ = &sv;
   cfg_ = &cfg;
   storage_ = &storage;
@@ -47,11 +48,11 @@ void lfs_server::setup_handlers() {
   });
 }
 
-// @NOTE(lev): the API does not specify clearly what to do if something like
-// parsing a JSON goes bad. I have tried the reference Go server and they just
-// return the following: { "objects" : "null }. We will do the same thing
-// for now; notice that all exceptions that occur while the server is running
-// will get here.
+// @NOTE: the API does not specify clearly what to do if something like
+// parsing a JSON goes bad. I have tried the reference Go server and
+// they just return the following: { "objects" : "null }. We will do the
+// same thing for now; notice that all exceptions that occur while the
+// server is running will get here.
 void lfs_server::exceptions_handler(const request_t&, response_t& response,
                                     std::exception_ptr) {
   response.status = static_cast<int>(http_response_codes::ok);
@@ -160,17 +161,18 @@ void lfs_server::process_batch_request(const json_t& request,
                                        response_t& response) {
   const auto objects = request["objects"].array_items();
 
-  // @NOTE(lev): API is silent about this, but since there is no
-  // reasonable thing to do, we will throw an exception.
+  // @NOTE: API is silent about this, but since there is no reasonable
+  // thing to do, we will throw an exception.
   if (objects.empty()) {
     throw lfs::json_parse_error{"`objects` key is mandatory."};
   }
 
   auto temp_op = request["operation"].string_value();
 
-  // @NOTE(lev): again, the API does not tell what to do if the request
-  // does not specify the operation or the operation is not download or upload.
-  // In our case, we are going to assume that the client wants to download.
+  // @NOTE: again, the API does not tell what to do if the request does
+  // not specify the operation or the operation is not download or
+  // upload.  In our case, we are going to assume that the client wants
+  // to download.
   if (temp_op.empty() || (temp_op != "download" && temp_op != "upload")) {
     temp_op = "download";
   }
@@ -203,8 +205,8 @@ void lfs_server::create_download_batch_response(
       continue;
     }
 
-    // If the size does not come in the request or they provided zero, obtain
-    // it.
+    // If the size does not come in the request or they provided zero,
+    // obtain it.
     if (size == 0) {
       obj.size = storage_->get_file_size(oid);
     }

@@ -4,9 +4,9 @@
 
 #include "config.h"
 #include "httplib.h"
+#include "istorage.h"
 #include "json11.hpp"
 #include "lfs.h"
-#include "istorage.h"
 
 namespace server {
 
@@ -28,14 +28,15 @@ class lfs_server {
   // Handlers.
  private:
   void setup_handlers();
-  static void exceptions_handler(const request_t &, response_t &, std::exception_ptr);
+  static void exceptions_handler(const request_t &, response_t &,
+                                 std::exception_ptr);
   void batch_request_handler(const request_t &, response_t &);
   void download_handler(const request_t &, response_t &);
   void upload_handler(const request_t &, response_t &);
   void verify_handler(const request_t &, response_t &);
 
  private:
-  void process_batch_request(const json_t &, const std::string&, response_t &);
+  void process_batch_request(const json_t &, const std::string &, response_t &);
   void create_download_batch_response(const json_array_t &, const std::string &,
                                       lfs::batch_response &);
   void create_upload_batch_response(const json_array_t &objects,
