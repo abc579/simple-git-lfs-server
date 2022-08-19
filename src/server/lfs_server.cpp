@@ -79,10 +79,15 @@ void lfs_server::batch_request_handler(const request_t& request,
 void lfs_server::download_handler(const request_t& request,
                                   response_t& response) {
   const auto oid = get_path_from_url(request.path);
-  const auto binary_file = storage_->read_file(oid);
-  response.set_header("Accept", ACCEPT_LFS);
-  response.set_content(binary_file, "application/octet-stream");
-  response.status = static_cast<int>(http_response_codes::ok);
+  try {
+    const auto binary_file = storage_->read_file(oid);
+    response.set_header("Accept", ACCEPT_LFS);
+    response.set_content(binary_file, "application/octet-stream");
+    response.status = static_cast<int>(http_response_codes::ok);
+  } catch (const storage::storage_exception& se) {
+    response.status = static_cast<int>(http_response_codes::internal_error);
+    std::cerr << se.what() << std::endl;
+  }
 }
 
 void lfs_server::upload_handler(const request_t& request,
@@ -101,13 +106,10 @@ void lfs_server::verify_handler(const request_t& request,
                                 response_t& response) {
   std::string msg;
   const auto object = parse_json(request.body, msg);
-
   if (!msg.empty()) {
     throw json_parse_error{"verify_handler(): Error parsing JSON."};
   }
-
   const auto oid = object["oid"].string_value();
-
   if (!storage_->file_exists(oid)) {
     response.status = static_cast<int>(object_error_codes::not_found);
   } else {

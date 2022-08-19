@@ -47,8 +47,8 @@ std::string storage::local_storage::read_file(const std::string& oid) {
     throw storage_exception{ss.str()};
   }
   std::noskipws(file);
-  std::string binary_file(std::istream_iterator<char>(file),
-                          std::istream_iterator<char>{});
+  const std::string binary_file(std::istream_iterator<char>(file),
+                                std::istream_iterator<char>{});
   return binary_file;
 }
 
@@ -61,6 +61,5 @@ size_t storage::local_storage::get_file_size(const std::string& oid) {
                      std::ios::in | std::ios::binary);
   file.unsetf(std::ios::skipws);
   file.seekg(0, std::ios::end);
-  file.close();
   return file.tellg();
 }

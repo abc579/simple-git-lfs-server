@@ -5,7 +5,6 @@
 
 namespace storage {
 
-// @TEMP: Let's see if we can use exceptions to handle storage errors.
 class storage_exception : public std::exception {
   std::string err;
 
