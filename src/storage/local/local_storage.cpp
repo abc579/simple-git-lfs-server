@@ -16,9 +16,8 @@ void storage::local_storage::write_file(const std::string& oid,
                                         const std::string& raw) {
   std::ofstream file{file_directory_ + '/' + oid,
                      std::ios::out | std::ios::binary};
-  std::vector<unsigned char> raw_vec{raw.begin(), raw.end()};
-  file.write(reinterpret_cast<char*>(&raw_vec.front()),
-             sizeof(unsigned char) * raw_vec.size());
+  file.write(reinterpret_cast<char*>(raw.front()),
+             sizeof(unsigned char) * raw.size());
   file.close();
 }
 
