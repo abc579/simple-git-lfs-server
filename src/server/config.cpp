@@ -37,11 +37,11 @@ void config::ensure_env_vars_not_empty() {
 }
 
 void config::ensure_port_is_numeric() {
-  auto port = get_env_var_or_throw(
+  auto port_str = get_env_var_or_throw(
       "LFS_PORT", "The environment variable LFS_PORT is mandatory.");
 
   try {
-    port_ = std::stoi(port);
+    port_ = std::stoi(port_str);
   } catch (const std::invalid_argument&) {
     throw config_error{"Could not convert port string to number because it "
                        "contains a non-numeric character."};
