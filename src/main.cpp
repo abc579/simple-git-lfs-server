@@ -7,6 +7,9 @@
 #include "storage/get_storage_option.h"
 
 int main() {
+  // Since we are not using any C I/O and we still care about performance,
+  // we are going to disable sync with these streams.
+  std::ios::sync_with_stdio(false);
   try {
     server::config cfg;
     auto storage_opt =

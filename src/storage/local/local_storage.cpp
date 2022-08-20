@@ -47,9 +47,9 @@ std::string storage::local_storage::read_file(const std::string& oid) {
     throw storage_exception{ss.str()};
   }
   std::noskipws(file);
-  const std::string binary_file(std::istream_iterator<char>(file),
-                                std::istream_iterator<char>{});
-  return binary_file;
+  std::stringstream ss;
+  ss << file.rdbuf();
+  return ss.str();
 }
 
 bool storage::local_storage::file_exists(const std::string& oid) {
