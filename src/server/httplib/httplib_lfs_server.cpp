@@ -16,10 +16,11 @@ using namespace lfs;
 using namespace server;
 using namespace util;
 
-httplib_lfs_server::httplib_lfs_server(config& cfg, istorage& storage) {
+httplib_lfs_server::httplib_lfs_server(config& cfg, istorage& storage,
+                                       SSLServer& server) {
   cfg_ = &cfg;
   storage_ = &storage;
-  server_ = std::make_unique<SSLServer>(cfg.cert().c_str(), cfg.key().c_str());
+  server_ = &server;
 }
 
 void httplib_lfs_server::listen() {
@@ -223,7 +224,6 @@ void httplib_lfs_server::create_upload_response(
   }
 }
 
-// @TODO: naming.
 batch_response httplib_lfs_server::create_batch_response(
     const std::string& op, const json_array_t& objects,
     const std::string& authorization) {

@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "ilfs_server.h"
+#include "lfs.h"
 
 namespace httplib {
 class SSLServer;
@@ -32,19 +32,19 @@ using json_t = json11::Json;
 using json_object_t = json11::object;
 using json_array_t = json11::array;
 
-class httplib_lfs_server : public ilfs_server {
+class httplib_lfs_server {
  public:
-  httplib_lfs_server(server::config &, storage::istorage &);
+  httplib_lfs_server(server::config &, storage::istorage &, httplib::SSLServer&);
   ~httplib_lfs_server() = default;
 
  public:
-  void listen() override;
-  void stop() override;
-  void set_batch_handler() override;
-  void set_download_handler() override;
-  void set_upload_handler() override;
-  void set_verify_handler() override;
-  void set_exception_handler() override;
+  void listen();
+  void stop();
+  void set_batch_handler();
+  void set_download_handler();
+  void set_upload_handler();
+  void set_verify_handler();
+  void set_exception_handler();
 
  private:
   void process_batch_request(const json_t &, const std::string &,
@@ -67,7 +67,7 @@ class httplib_lfs_server : public ilfs_server {
       const std::string &, const std::string &);
 
  private:
-  std::unique_ptr<httplib::SSLServer> server_;
+  httplib::SSLServer* server_;
   server::config *cfg_;
   storage::istorage *storage_;
 };

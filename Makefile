@@ -1,29 +1,27 @@
 ##########################################
 ## Compiler.
 CXX = g++
-CXXFLAGS = -std=c++14 -O3 -Wall -Wpedantic -Wextra -fsanitize=address
+CXXFLAGS = -std=c++14 -O3 -Wall -Wpedantic -Wextra
 ##########################################
 ## Sources.
 MAIN_SRC = src/main.cpp
 MAIN_OBJ = $(MAIN_SRC:.cpp=.o)
 #
-SV_FILES = $(shell find src/server -type f -name '*.cpp') # $(wildcard src/server/*)
+SV_FILES = $(shell find src/server -type f -name '*.cpp')
 SV_SRCS = $(filter %.cpp, $(SV_FILES))
 SV_OBJS = $(SV_SRCS:.cpp=.o)
 #
 UTIL_FILES = $(wildcard src/util/*)
-UTIL_SRCS = $(filter %.cpp, $(UTIL_FILES))
-UTIL_OBJS = $(UTIL_SRCS:.cpp=.o)
+UTIL_SRCS  = $(filter %.cpp, $(UTIL_FILES))
+UTIL_OBJS  = $(UTIL_SRCS:.cpp=.o)
 #
 DEP_FILES = $(wildcard third_party/*)
-DEP_SRCS = $(filter %.cpp, $(DEP_FILES))
-DEP_OBJS = $(DEP_SRCS:.cpp=.o)
+DEP_SRCS  = $(filter %.cpp, $(DEP_FILES))
+DEP_OBJS  = $(DEP_SRCS:.cpp=.o)
 #
-STOR_FILES  = src/get_storage_option.cpp
-STOR_FILES += $(wildcard src/storage/local/*)
-STOR_FILES += $(wildcard src/storage/google/*)
-STOR_SRCS = $(filter %.cpp, $(STOR_FILES))
-STOR_OBJS = $(STOR_SRCS:.cpp=.o)
+STOR_FILES = $(shell find src/storage -type f -name '*.cpp')
+STOR_SRCS  = $(filter %.cpp, $(STOR_FILES))
+STOR_OBJS  = $(STOR_SRCS:.cpp=.o)
 #
 ALL_OBJS = $(MAIN_OBJ)  \
            $(SV_OBJS)   \

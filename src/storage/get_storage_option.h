@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include "storage/istorage.h"
+#include "istorage.h"
 
 // This function just returns the corresponding object based on
 // `OPTION`.  It acts like a factory method (in OOP) but I did not
