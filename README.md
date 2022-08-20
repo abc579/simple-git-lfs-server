@@ -134,12 +134,11 @@ oid sha256:1c2b747b592d66024d63e31178bd8270a95cb5f46db0101bc987d4d0b651b41c
 size 24642
 ```
 13. Now, if we check the file directory (which we specified in the `LFS_FILE_DIRECTORY` variable in the `load_env.sh` file)
-    we should see that the _actual_ object was stored in it, following the git protocol to store files, that is, the first two
-    characters represent the parent directory, the next two the child directory... For example:
+    we should see that the _actual_ object was stored in it. For example:
 ```
-cd simple-git-lfs-server/files/1c/2b
+cd simple-git-lfs-server/files
 ls -l
-25K Aug 15 03:36 747b592d66024d63e31178bd8270a95cb5f46db0101bc987d4d0b651b41c
+25K Aug 15 03:36 1c2b747b592d66024d63e31178bd8270a95cb5f46db0101bc987d4d0b651b41c
 ```
 14. Finally, we can clone our repository to check that we are getting
     the contents of our files correctly:
@@ -205,7 +204,6 @@ Third note: if you want to stop the server you can always hit CTRL+C or access t
 - [X] Check use case of performing an edition on a png file and see how commits are managed.
 - [X] Try installation in a docker image and prepare dockerfile.
 - [X] Make it more extensible.
-- [ ] Get rid of library coupling.
 - [X] Error handling while creating or opening files.
 - [ ] Support Google Cloud Storage:
       https://github.com/googleapis/google-cloud-cpp/blob/main/google/cloud/storage/README.md
