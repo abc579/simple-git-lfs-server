@@ -221,5 +221,3 @@ Even though no one is going to see this repository, I would like to thank:
 - The authors of the httplib library.
 - The authors of the json11 library.
 - Rene Nyffenegger for his base64 code snippet.
-- jart because I somehow stumbled upon their cosmopolitan repository and I am learning a lot.
-- rui314 for the exact same reason described before with their chibicc repository.
