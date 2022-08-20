@@ -16,11 +16,10 @@ using namespace lfs;
 using namespace server;
 using namespace util;
 
-httplib_lfs_server::httplib_lfs_server(config& cfg, SSLServer& sv,
-                                       istorage& storage) {
-  server_ = &sv;
+httplib_lfs_server::httplib_lfs_server(config& cfg, istorage& storage) {
   cfg_ = &cfg;
   storage_ = &storage;
+  server_ = std::make_unique<SSLServer>(cfg.cert().c_str(), cfg.key().c_str());
 }
 
 void httplib_lfs_server::listen() {

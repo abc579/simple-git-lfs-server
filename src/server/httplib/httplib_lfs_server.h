@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <memory>
 
 #include "ilfs_server.h"
 
@@ -33,8 +34,7 @@ using json_array_t = json11::array;
 
 class httplib_lfs_server : public ilfs_server {
  public:
-  httplib_lfs_server(server::config &, httplib::SSLServer &,
-                     storage::istorage &);
+  httplib_lfs_server(server::config &, storage::istorage &);
   ~httplib_lfs_server() = default;
 
  public:
@@ -67,7 +67,7 @@ class httplib_lfs_server : public ilfs_server {
       const std::string &, const std::string &);
 
  private:
-  httplib::SSLServer *server_;
+  std::unique_ptr<httplib::SSLServer> server_;
   server::config *cfg_;
   storage::istorage *storage_;
 };

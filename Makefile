@@ -69,6 +69,7 @@ clean :
 	rm -f src/storage/local/*.o
 	rm -f src/storage/google/*.o
 	rm -f src/server/*.o
+	rm -f src/server/httplib/*.o
 	rm -f src/util/*.o
 
 # If there is a target called clean/all/run then GNUmake could be confused, so we

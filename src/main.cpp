@@ -13,9 +13,8 @@ int main() {
   using namespace storage;
   try {
     config cfg;
-    httplib::SSLServer ssl_server(cfg.cert().c_str(), cfg.key().c_str());
-    auto so = get_storage_option(cfg.storage_option(), cfg.file_directory());
-    auto sv = std::make_unique<lfs::httplib_lfs_server>(cfg, ssl_server, *so);
+    auto storage_opt = get_storage_option(cfg.storage_option(), cfg.file_directory());
+    auto sv = std::make_unique<lfs::httplib_lfs_server>(cfg, *storage_opt);
     sv->listen();
   } catch (const config_error& err) {
     std::cerr << "Config_error: " << err.what() << std::endl;
