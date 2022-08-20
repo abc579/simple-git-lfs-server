@@ -47,6 +47,10 @@ void lfs_server::setup_handlers() {
   server_->Post("/verify", [&](const auto& request, auto& response) {
     verify_handler(request, response);
   });
+
+  server_->Get("/stop", [&](const auto&, auto&) {
+    server_->stop();
+  });
 }
 
 // @NOTE: the API does not specify clearly what to do if something like

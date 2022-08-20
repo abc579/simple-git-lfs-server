@@ -156,9 +156,11 @@ fine, you should see the original file now and not the text pointer.
 Note: you can run `make clean` to remove all object files and
 executables created. _This will not delete the file directory._
 
-Second Note: if you do not plan to use the server anymore, do not forget
+Second note: if you do not plan to use the server anymore, do not forget
 to remove the file directory where all files are going to be
 stored. Remember, the one we specified in `LFS_FILE_DIRECTORY`.
+
+Third note: if you want to stop the server you can always hit CTRL+C or access the path /stop in your browser.
 
 # Worklog
 
@@ -205,7 +207,7 @@ stored. Remember, the one we specified in `LFS_FILE_DIRECTORY`.
 - [X] Try installation in a docker image and prepare dockerfile.
 - [X] Make it more extensible.
 - [ ] Get rid of library coupling.
-- [ ] Error handling while creating or opening files.
+- [X] Error handling while creating or opening files.
 - [ ] Support Google Cloud Storage:
       https://github.com/googleapis/google-cloud-cpp/blob/main/google/cloud/storage/README.md
       I think it is just matter of changing the part where we are going
