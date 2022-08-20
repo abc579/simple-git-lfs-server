@@ -2,6 +2,7 @@ out/
 src/*.o
 src/tool/*.o
 src/server/*.o
+src/server/httplib/*.o
 third_party/*.o
 compile_commands.json
 test/test
