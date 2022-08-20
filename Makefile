@@ -1,13 +1,13 @@
 ##########################################
 ## Compiler.
 CXX = g++
-CXXFLAGS = -std=c++14 -O3 -Wall -Wpedantic -Wextra
+CXXFLAGS = -std=c++14 -O3 -Wall -Wpedantic -Wextra -fsanitize=address
 ##########################################
 ## Sources.
 MAIN_SRC = src/main.cpp
 MAIN_OBJ = $(MAIN_SRC:.cpp=.o)
 #
-SV_FILES = $(wildcard src/server/*)
+SV_FILES = $(shell find src/server -type f -name '*.cpp') # $(wildcard src/server/*)
 SV_SRCS = $(filter %.cpp, $(SV_FILES))
 SV_OBJS = $(SV_SRCS:.cpp=.o)
 #

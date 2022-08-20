@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -77,6 +78,19 @@ struct batch_response {
   std::vector<batch_response_object> objects;
   const std::string transfer{"basic"};
   const std::string hash_algo{HASH_ALGO};
+};
+
+class ilfs_server {
+ public:
+  virtual void listen() = 0;
+  virtual void stop() = 0;
+  virtual void set_batch_handler() = 0;
+  virtual void set_download_handler() = 0;
+  virtual void set_upload_handler() = 0;
+  virtual void set_verify_handler() = 0;
+  virtual void set_exception_handler() = 0;
+
+  ~ilfs_server() = default;
 };
 
 }  // namespace lfs
